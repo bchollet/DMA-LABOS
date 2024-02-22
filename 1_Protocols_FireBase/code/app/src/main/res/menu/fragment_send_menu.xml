@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_encryption"
+        android:orderInCategory="100"
+        android:title="@string/action_encryption"
+        android:icon="@drawable/lock"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/action_encryption_disabled"
+                android:orderInCategory="101"
+                android:title="@string/action_encryption_disabled"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_encryption_ssl"
+                android:orderInCategory="102"
+                android:title="@string/action_encryption_ssl"
+                android:checkable="true" />
+        </menu>
+    </item >
+
+    <item
+        android:id="@+id/action_network"
+        android:orderInCategory="300"
+        android:title="@string/action_network"
+        android:icon="@drawable/speedometer"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/action_network_random"
+                android:orderInCategory="301"
+                android:title="@string/action_network_random"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_network_csd"
+                android:orderInCategory="302"
+                android:title="@string/action_network_csd"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_network_gprs"
+                android:orderInCategory="303"
+                android:title="@string/action_network_gprs"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_network_edge"
+                android:orderInCategory="304"
+                android:title="@string/action_network_edge"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_network_umts"
+                android:orderInCategory="305"
+                android:title="@string/action_network_umts"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_network_hspa"
+                android:orderInCategory="306"
+                android:title="@string/action_network_hspa"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_network_lte"
+                android:orderInCategory="307"
+                android:title="@string/action_network_lte"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_network_nr5g"
+                android:orderInCategory="308"
+                android:title="@string/action_network_nr5g"
+                android:checkable="true" />
+        </menu>
+    </item >
+
+    <item
+        android:id="@+id/action_compression"
+        android:orderInCategory="500"
+        android:title="@string/action_compression"
+        android:icon="@drawable/zip"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/action_compression_disabled"
+                android:orderInCategory="501"
+                android:title="@string/action_compression_disabled"
+                android:checkable="true" />
+
+            <item
+                android:id="@+id/action_compression_deflate"
+                android:orderInCategory="502"
+                android:title="@string/action_compression_deflate"
+                android:checkable="true" />
+        </menu>
+    </item >
+
+</menu>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/container_padding" >
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/dialog_create_measure_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:checkedChip="@id/dialog_create_measure_type_temperature"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/dialog_create_measure_value"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/dialog_create_measure_type_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            app:chipIcon="@drawable/temperature"
+            app:chipIconVisible="true"
+            android:text="@string/dialog_create_measure_type_temperature" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/dialog_create_measure_type_pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            app:chipIcon="@drawable/pressure"
+            app:chipIconVisible="true"
+            android:text="@string/dialog_create_measure_type_pressure" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/dialog_create_measure_type_humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            app:chipIcon="@drawable/humidity"
+            app:chipIconVisible="true"
+            android:text="@string/dialog_create_measure_type_humidity" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/dialog_create_measure_type_precipitation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            app:chipIcon="@drawable/precipitation"
+            app:chipIconVisible="true"
+            android:text="@string/dialog_create_measure_type_precipitation" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/dialog_create_measure_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/dialog_create_measure_value_hint"
+        app:layout_constraintTop_toBottomOf="@id/dialog_create_measure_type"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_send"
+        android:icon="@drawable/json"
+        android:title="@string/main_nav_title_send" />
+
+    <item
+        android:id="@+id/navigation_graphql"
+        android:icon="@drawable/graphql"
+        android:title="@string/main_nav_title_graphql" />
+
+    <item
+        android:id="@+id/navigation_push"
+        android:icon="@drawable/push"
+        android:title="@string/main_nav_title_push" />
+
+</menu>

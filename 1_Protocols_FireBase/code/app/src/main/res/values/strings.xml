@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">DMA_Labo1</string>
+
+    <string name="main_nav_title_send">Measures</string>
+    <string name="main_nav_title_graphql">GraphQL</string>
+    <string name="main_nav_title_push">Push</string>
+
+    <string name="action_encryption">Deflate</string>
+        <string name="action_encryption_disabled">Disabled</string>
+        <string name="action_encryption_ssl">TLS</string>
+
+    <string name="action_compression">Deflate</string>
+        <string name="action_compression_disabled">Disabled</string>
+        <string name="action_compression_deflate">Deflate</string>
+
+    <string name="action_network">Network</string>
+        <string name="action_network_random">Random</string>
+        <string name="action_network_csd">CSD (2G)</string>
+        <string name="action_network_gprs">GPRS (2.5G)</string>
+        <string name="action_network_edge">EDGE (2.75G)</string>
+        <string name="action_network_umts">UMTS (3G)</string>
+        <string name="action_network_hspa">HSPA (3.5G)</string>
+        <string name="action_network_lte">LTE (4G)</string>
+        <string name="action_network_nr5g">NR (5G)</string>
+
+    <string name="fragment_send_serialisation_json">JSON</string>
+    <string name="fragment_send_serialisation_xml">XML</string>
+    <string name="fragment_send_serialisation_protobuf">Protobuf</string>
+
+    <string name="fragment_send_btn_clear">Clear</string>
+    <string name="fragment_send_btn_create">Create</string>
+    <string name="fragment_send_btn_send">Send</string>
+
+    <string name="fragment_push_no_message">No message</string>
+
+    <string name="dialog_create_measure_title">Create a new measure</string>
+    <string name="dialog_create_measure_btn_create">Create</string>
+    <string name="dialog_create_measure_btn_cancel">Cancel</string>
+    <string name="dialog_create_measure_value_hint">Measured value</string>
+    <string name="dialog_create_measure_type_temperature">Temperature [°C]</string>
+    <string name="dialog_create_measure_type_humidity">Humidity [%]</string>
+    <string name="dialog_create_measure_type_pressure">Pressure [hpa]</string>
+    <string name="dialog_create_measure_type_precipitation">Precipitation [mm]</string>
+
+    <string name="fragment_graphql_selectauthor">Select author:</string>
+
+</resources>

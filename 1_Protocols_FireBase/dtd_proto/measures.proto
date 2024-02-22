@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_package = "ch.heigvd.iict.dma.protobuf";
+
+enum Status {
+  NEW = 0;
+  OK = 1;
+  ERROR = 2;
+}
+
+message Measures {
+  repeated Measure measures = 1;
+}
+
+message MeasuresAck {
+  repeated MeasureAck measures = 1;
+}
+
+message Measure {
+  uint32 id = 1;
+  Status status = 2;
+  string type = 3;
+  double value = 4;
+  uint64 date = 5;
+}
+
+message MeasureAck {
+  uint32 id = 1;
+  Status status = 2;
+}

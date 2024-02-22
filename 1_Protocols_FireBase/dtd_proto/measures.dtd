@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT measures (measure*)>
+<!ELEMENT measure (type, value, date)>
+        <!ATTLIST measure id CDATA #REQUIRED
+                  status (OK|NEW|ERROR) #REQUIRED>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
