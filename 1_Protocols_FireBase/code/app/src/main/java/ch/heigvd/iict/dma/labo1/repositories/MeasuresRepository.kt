@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import ch.heigvd.iict.dma.labo1.models.*
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.system.measureTimeMillis
 
 class MeasuresRepository(private val scope : CoroutineScope,
@@ -51,8 +54,31 @@ class MeasuresRepository(private val scope : CoroutineScope,
                 Encryption.SSL -> httpsUrl
             }
 
+
             val elapsed = measureTimeMillis {
-                Log.e("SendViewModel", "Implement me !!! Send measures to $url") //TODO
+                val body = when (serialisation) {
+                    Serialisation.JSON -> Gson().toJson(_measures.value)
+                    Serialisation.XML -> TODO()
+                    Serialisation.PROTOBUF -> TODO()
+                }
+
+
+                val request = URL(url)
+                val connection = request.openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                connection.setRequestProperty("Content-Type", "application ${serialisation.name.lowercase()}")
+                connection.setRequestProperty("X-Network", networkType.name)
+                connection.setRequestProperty("X-Content-Encoding", compression.name)
+                connection.setRequestProperty("User-Agent", "Ferati-Bollet")
+                connection.outputStream.bufferedWriter(Charsets.UTF_8).use {
+                    it.append(body)
+                }
+
+                connection.inputStream.bufferedReader(Charsets.UTF_8).use {
+                    Log.d("Response", it.readText())
+
+                }
             }
             _requestDuration.postValue(elapsed)
         }
