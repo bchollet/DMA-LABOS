@@ -19,7 +19,7 @@ class MeasuresRepository(private val scope : CoroutineScope,
                          private val httpsUrl : String = "https://mobile.iict.ch/api") {
 
     private val _measures = MutableLiveData(mutableListOf<Measure>())
-    val measures = _measures.map { mList -> mList.toList() }
+    val measures = _measures.map { mList -> mList.toList().map { el -> el.copy() } }
 
     private val _requestDuration = MutableLiveData(-1L)
     val requestDuration : LiveData<Long> get() = _requestDuration
@@ -54,32 +54,38 @@ class MeasuresRepository(private val scope : CoroutineScope,
                 Encryption.SSL -> httpsUrl
             }
 
-
+            var t: MutableList<Measure>? = null;
             val elapsed = measureTimeMillis {
-                val body = when (serialisation) {
-                    Serialisation.JSON -> Gson().toJson(_measures.value)
+                val gson = Gson()
+                val requestBody = when (serialisation) {
+                    Serialisation.JSON -> gson.toJson(_measures.value)
                     Serialisation.XML -> TODO()
                     Serialisation.PROTOBUF -> TODO()
                 }
-
 
                 val request = URL(url)
                 val connection = request.openConnection() as HttpURLConnection
                 connection.requestMethod = "POST"
                 connection.doOutput = true
-                connection.setRequestProperty("Content-Type", "application ${serialisation.name.lowercase()}")
+                connection.setRequestProperty("Content-Type", "application/${serialisation.name.lowercase()}")
                 connection.setRequestProperty("X-Network", networkType.name)
                 connection.setRequestProperty("X-Content-Encoding", compression.name)
                 connection.setRequestProperty("User-Agent", "Ferati-Bollet")
                 connection.outputStream.bufferedWriter(Charsets.UTF_8).use {
-                    it.append(body)
+                    it.append(requestBody)
                 }
 
-                connection.inputStream.bufferedReader(Charsets.UTF_8).use {
-                    Log.d("Response", it.readText())
+                val responseBody = connection.inputStream.bufferedReader(Charsets.UTF_8).readText()
+                Log.d("response", responseBody)
+                val acknowledgments = gson.fromJson(responseBody, Array<Measure>::class.java)
 
+                _measures.value!!.forEach {newMeasure ->
+                    acknowledgments.find { it.id == newMeasure.id }?.let {
+                        newMeasure.status = it.status
+                    }
                 }
             }
+            _measures.postValue(_measures.value!!)
             _requestDuration.postValue(elapsed)
         }
     }
