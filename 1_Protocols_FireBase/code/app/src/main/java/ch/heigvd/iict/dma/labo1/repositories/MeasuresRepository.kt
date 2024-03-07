@@ -1,6 +1,5 @@
 package ch.heigvd.iict.dma.labo1.repositories
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -12,6 +11,15 @@ import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.system.measureTimeMillis
+import org.jdom2.*
+import org.jdom2.input.SAXBuilder
+import org.jdom2.output.XMLOutputter
+import java.io.StringReader
+import java.io.StringWriter
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
+data class Acknowledgment(val id: Int, val status: Measure.Status)
 
 class MeasuresRepository(private val scope : CoroutineScope,
                          private val dtd : String = "https://mobile.iict.ch/measures.dtd",
@@ -46,6 +54,56 @@ class MeasuresRepository(private val scope : CoroutineScope,
         _measures.postValue(mutableListOf())
     }
 
+    private fun xmlToMeasures(xml: String): Array<Acknowledgment> {
+        val acks = mutableListOf<Acknowledgment>()
+
+        val builder = SAXBuilder().apply {
+            setFeature("http://xml.org/sax/features/external-general-entities", false)
+        }
+
+        val doc = builder.build(StringReader(xml))
+        for (element in doc.rootElement.getChildren("measure")) {
+            val id = element.getAttributeValue("id").toInt()
+            val status = element.getAttributeValue("status")
+            acks.add(Acknowledgment(id, Measure.Status.valueOf(status)))
+        }
+
+        return acks.toTypedArray()
+    }
+
+    private fun measuresToXml(measures: List<Measure>): String {
+        val root = Element("measures")
+        measures.forEach { m ->
+            val element = Element("measure")
+            element.setAttribute("id", m.id.toString())
+            element.setAttribute("status", m.status.toString())
+
+            val type = Element("type")
+            type.text = m.type.toString()
+
+            val value = Element("value")
+            value.text = DecimalFormat("#.${"#"}").format(m.value)
+
+            val date = Element("date")
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
+            date.text = dateFormat.format(m.date.time)
+
+            element.addContent(type)
+            element.addContent(value)
+            element.addContent(date)
+
+            root.addContent(element)
+        }
+
+        val document = Document(root)
+        val stringWriter = StringWriter()
+        val outputter = XMLOutputter()
+        document.docType = DocType("measures", dtd)
+
+        outputter.output(document, stringWriter)
+        return stringWriter.toString()
+    }
+
     fun sendMeasureToServer(encryption : Encryption, compression : Compression, networkType : NetworkType, serialisation : Serialisation) {
         scope.launch(Dispatchers.Default) {
 
@@ -54,12 +112,11 @@ class MeasuresRepository(private val scope : CoroutineScope,
                 Encryption.SSL -> httpsUrl
             }
 
-            var t: MutableList<Measure>? = null;
             val elapsed = measureTimeMillis {
                 val gson = Gson()
                 val requestBody = when (serialisation) {
                     Serialisation.JSON -> gson.toJson(_measures.value)
-                    Serialisation.XML -> TODO()
+                    Serialisation.XML -> measuresToXml(_measures.value!!)
                     Serialisation.PROTOBUF -> TODO()
                 }
 
@@ -76,8 +133,11 @@ class MeasuresRepository(private val scope : CoroutineScope,
                 }
 
                 val responseBody = connection.inputStream.bufferedReader(Charsets.UTF_8).readText()
-                Log.d("response", responseBody)
-                val acknowledgments = gson.fromJson(responseBody, Array<Measure>::class.java)
+                val acknowledgments = when(serialisation) {
+                    Serialisation.JSON -> gson.fromJson(responseBody, Array<Acknowledgment>::class.java)
+                    Serialisation.XML -> xmlToMeasures(responseBody)
+                    Serialisation.PROTOBUF -> TODO()
+                }
 
                 _measures.value!!.forEach {newMeasure ->
                     acknowledgments.find { it.id == newMeasure.id }?.let {
