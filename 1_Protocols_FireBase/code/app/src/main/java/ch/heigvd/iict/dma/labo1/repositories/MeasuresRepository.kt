@@ -1,9 +1,12 @@
 package ch.heigvd.iict.dma.labo1.repositories
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import ch.heigvd.iict.dma.labo1.models.*
+import ch.heigvd.iict.dma.protobuf.MeasuresOuterClass
+import ch.heigvd.iict.dma.protobuf.MeasuresOuterClass.Measures
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +22,12 @@ import java.io.StringWriter
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.zip.Deflater
+import java.util.zip.DeflaterInputStream
+import java.util.zip.DeflaterOutputStream
+import java.util.zip.Inflater
+import java.util.zip.InflaterInputStream
+
 data class Acknowledgment(val id: Int, val status: Measure.Status)
 
 class MeasuresRepository(private val scope : CoroutineScope,
@@ -54,7 +63,114 @@ class MeasuresRepository(private val scope : CoroutineScope,
         _measures.postValue(mutableListOf())
     }
 
-    private fun xmlToMeasures(xml: String): Array<Acknowledgment> {
+    fun measureAll() {
+        for (compression in Compression.entries) {
+            for (network in listOf(NetworkType.CSD, NetworkType.EDGE, NetworkType.NR5G)) {
+                for (serialization in listOf(Serialisation.JSON, Serialisation.XML, Serialisation.PROTOBUF)) {
+                    for (nbMeasure in listOf(1, 10, 100)) {
+                        val count = 10
+                        var elapsedTimeMean = 0
+
+
+                    }
+                }
+            }
+        }
+    }
+
+    fun sendMeasureToServer(encryption : Encryption, compression : Compression, networkType : NetworkType, serialisation : Serialisation) {
+        scope.launch(Dispatchers.Default) {
+            val url = when (encryption) {
+                Encryption.DISABLED -> httpUrl
+                Encryption.SSL -> httpsUrl
+            }
+            val elapsed = measureTimeMillis {
+                val gson = Gson()
+                val measuresToSend = _measures.value!!.filter { it.status != Measure.Status.OK}
+                val requestPayload = when (serialisation) {
+                    Serialisation.JSON -> gson.toJson(measuresToSend).encodeToByteArray()
+                    Serialisation.XML -> measuresToXml(measuresToSend).encodeToByteArray()
+                    Serialisation.PROTOBUF -> measuresToProtobuf(measuresToSend).toByteArray()
+                }
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                connection.setRequestProperty("Content-Type", "application/${serialisation.name.lowercase()};charset=utf-8")
+                connection.setRequestProperty("X-Network", networkType.name)
+                connection.setRequestProperty("X-Content-Encoding", compression.toString())
+                connection.setRequestProperty("User-Agent", "Ferati-Bollet")
+
+                // Send the data
+                val outStream = when(compression) {
+                    Compression.DISABLED -> connection.outputStream
+                    Compression.DEFLATE -> DeflaterOutputStream(connection.outputStream, Deflater(Deflater.BEST_SPEED, true))
+                }
+                outStream.write(requestPayload)
+                outStream.close()
+
+                // Check the response status
+                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                    val error = connection.headerFields["X-Error"]
+                    Log.e("MeasuresRepository", "Received ${connection.responseCode}: $error")
+                    return@launch
+                }
+
+                    val responseStream = when(compression) {
+                    Compression.DISABLED -> connection.inputStream
+                    Compression.DEFLATE -> InflaterInputStream(connection.inputStream, Inflater(true))
+                }
+
+                // Handle the response
+                val acknowledgments = when(serialisation) {
+                    Serialisation.JSON, Serialisation.XML -> {
+                       val stringResponse = responseStream.bufferedReader(Charsets.UTF_8).readText()
+
+                        when(serialisation) {
+                            Serialisation.JSON -> gson.fromJson(stringResponse, Array<Acknowledgment>::class.java).toList()
+                            Serialisation.XML -> xmlToMeasures(stringResponse).toList()
+                            else -> error("nope")
+                        }
+                    }
+                    Serialisation.PROTOBUF -> {
+                        val acksProtobuf = MeasuresOuterClass.MeasuresAck.parseFrom(responseStream)
+
+                        acksProtobuf.measuresList.map {
+                            val status = Measure.Status.valueOf(it.status.toString())
+                            Acknowledgment(it.id, status)
+                        }
+                    }
+                }
+                _measures.value!!.forEach {newMeasure ->
+                    acknowledgments.find { it.id == newMeasure.id }?.let {
+                        newMeasure.status = it.status
+                    }
+                }
+
+            }
+            _measures.postValue(_measures.value!!)
+            _requestDuration.postValue(elapsed)
+        }
+    }
+
+
+
+    private fun measuresToProtobuf(measures: List<Measure>) : Measures {
+        val measuresBuilder = Measures.newBuilder()
+        measures.forEach {
+            val measureBuilder = MeasuresOuterClass.Measure.newBuilder()
+
+            measureBuilder.date = it.date.timeInMillis
+            measureBuilder.id = it.id
+            measureBuilder.type = it.type.toString()
+            measureBuilder.status = MeasuresOuterClass.Status.valueOf(it.status.toString())
+            measureBuilder.value = it.value
+            measuresBuilder.addMeasures(measureBuilder)
+        }
+        return measuresBuilder.build()
+    }
+
+
+    private fun xmlToMeasures(xml: String): List<Acknowledgment> {
         val acks = mutableListOf<Acknowledgment>()
 
         val builder = SAXBuilder().apply {
@@ -68,7 +184,7 @@ class MeasuresRepository(private val scope : CoroutineScope,
             acks.add(Acknowledgment(id, Measure.Status.valueOf(status)))
         }
 
-        return acks.toTypedArray()
+        return acks
     }
 
     private fun measuresToXml(measures: List<Measure>): String {
@@ -102,52 +218,6 @@ class MeasuresRepository(private val scope : CoroutineScope,
 
         outputter.output(document, stringWriter)
         return stringWriter.toString()
-    }
-
-    fun sendMeasureToServer(encryption : Encryption, compression : Compression, networkType : NetworkType, serialisation : Serialisation) {
-        scope.launch(Dispatchers.Default) {
-
-            val url = when (encryption) {
-                Encryption.DISABLED -> httpUrl
-                Encryption.SSL -> httpsUrl
-            }
-
-            val elapsed = measureTimeMillis {
-                val gson = Gson()
-                val requestBody = when (serialisation) {
-                    Serialisation.JSON -> gson.toJson(_measures.value)
-                    Serialisation.XML -> measuresToXml(_measures.value!!)
-                    Serialisation.PROTOBUF -> TODO()
-                }
-
-                val request = URL(url)
-                val connection = request.openConnection() as HttpURLConnection
-                connection.requestMethod = "POST"
-                connection.doOutput = true
-                connection.setRequestProperty("Content-Type", "application/${serialisation.name.lowercase()}")
-                connection.setRequestProperty("X-Network", networkType.name)
-                connection.setRequestProperty("X-Content-Encoding", compression.name)
-                connection.setRequestProperty("User-Agent", "Ferati-Bollet")
-                connection.outputStream.bufferedWriter(Charsets.UTF_8).use {
-                    it.append(requestBody)
-                }
-
-                val responseBody = connection.inputStream.bufferedReader(Charsets.UTF_8).readText()
-                val acknowledgments = when(serialisation) {
-                    Serialisation.JSON -> gson.fromJson(responseBody, Array<Acknowledgment>::class.java)
-                    Serialisation.XML -> xmlToMeasures(responseBody)
-                    Serialisation.PROTOBUF -> TODO()
-                }
-
-                _measures.value!!.forEach {newMeasure ->
-                    acknowledgments.find { it.id == newMeasure.id }?.let {
-                        newMeasure.status = it.status
-                    }
-                }
-            }
-            _measures.postValue(_measures.value!!)
-            _requestDuration.postValue(elapsed)
-        }
     }
 
 }

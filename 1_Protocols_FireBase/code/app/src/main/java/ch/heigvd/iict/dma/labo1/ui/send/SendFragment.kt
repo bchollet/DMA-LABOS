@@ -43,7 +43,8 @@ class SendFragment : Fragment(), MenuProvider {
             sendViewModel.clearAllMeasures()
         }
         binding.fragmentSendBtnCreate.setOnClickListener {
-            CreateMeasureDialogFragment.getInstance().show(parentFragmentManager, "create_dialog")
+        sendViewModel.addMeasures(Measure.getRandomMeasures(10))
+        //CreateMeasureDialogFragment.getInstance().show(parentFragmentManager, "create_dialog")
         }
         binding.fragmentSendBtnCreate.setOnLongClickListener {
             val measuresToAdd = Measure.getRandomMeasures(10)

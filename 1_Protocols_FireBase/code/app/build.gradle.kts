@@ -58,7 +58,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
     implementation("androidx.preference:preference-ktx:1.2.1")
-
+    implementation("com.google.protobuf:protobuf-kotlin:3.25.3")
 
     // Serializations libs
     implementation("org.jdom:jdom2:2.0.6.1")
