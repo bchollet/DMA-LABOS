@@ -1,0 +1,11 @@
+2.1
+La récupération de l'ensemble des auteurs ou de leurs livres est problématique dans un contexte mobile, notamment lors d'une connexion internet de faible débit. La requête de tous les auteurs est trop volumineuses et devraient plutôt intégrer un système de pagination pour segmenter la taille de la réponse.
+
+Une autre possibilité serait la mise en cache de ces requêtes. On pourrait imaginer n'effectuer la récupération ou la mise à jour des auteurs que lorsque le téléphone accède à un point d'accès wifi.
+
+3.1
+Il permet d'identifier l'appareil sur lequel l'app est installée. Il est généré à l'installation, la réinstallation et la mise à jour de l'app.
+
+Dans le cadre d'une app comme WhatsApp, un token est généré à l'installation de l'app sur chacun des appareil où l'app est installée. Ce token permet ainsi d'identifier et de rediriger le message vers les bons appareils.
+
+Puisque chaque appareil va générer un token, il convient de les stocker dans une base de donnée sur le serveur. Ainsi, dès la réception d'un message, le serveur pourra redistribuer la notification à l'ensemble des appareils. Il convient bien sûr de maintenir cette DB à jour notamment lorsque l'app est réinstallée sur un appareil déjà enregistré.
