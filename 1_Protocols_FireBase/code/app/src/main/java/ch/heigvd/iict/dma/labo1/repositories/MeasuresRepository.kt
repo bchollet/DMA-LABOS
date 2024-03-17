@@ -62,22 +62,6 @@ class MeasuresRepository(private val scope : CoroutineScope,
     fun clearAllMeasures() {
         _measures.postValue(mutableListOf())
     }
-
-    fun measureAll() {
-        for (compression in Compression.entries) {
-            for (network in listOf(NetworkType.CSD, NetworkType.EDGE, NetworkType.NR5G)) {
-                for (serialization in listOf(Serialisation.JSON, Serialisation.XML, Serialisation.PROTOBUF)) {
-                    for (nbMeasure in listOf(1, 10, 100)) {
-                        val count = 10
-                        var elapsedTimeMean = 0
-
-
-                    }
-                }
-            }
-        }
-    }
-
     fun sendMeasureToServer(encryption : Encryption, compression : Compression, networkType : NetworkType, serialisation : Serialisation) {
         scope.launch(Dispatchers.Default) {
             val url = when (encryption) {
