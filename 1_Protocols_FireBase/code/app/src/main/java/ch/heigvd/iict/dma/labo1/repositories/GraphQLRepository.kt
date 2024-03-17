@@ -3,9 +3,12 @@ package ch.heigvd.iict.dma.labo1.repositories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ch.heigvd.iict.dma.labo1.models.*
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.system.measureTimeMillis
 
 class GraphQLRepository(private val scope : CoroutineScope, private val httpsUrl : String = "https://mobile.iict.ch/graphql") {
@@ -29,11 +32,22 @@ class GraphQLRepository(private val scope : CoroutineScope, private val httpsUrl
     fun loadAllAuthorsList() {
         scope.launch(Dispatchers.Default) {
             val elapsed = measureTimeMillis {
-                // TODO make the request to server
                 // fill _authors LiveData with list of all authors
+                val gson = Gson()
+                val query = "{findAllAuthors{id, name}}"
+                val connection = URL(httpsUrl).openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.outputStream.use {
+                    it.write(gson.toJson(mapOf("query" to query)).toByteArray())
+                }
+
+                val response = connection.inputStream.bufferedReader(Charsets.UTF_8).readText()
+                val authors = gson.fromJson(response, AuthorResponse::class.java).data.findAllAuthors
 
                 //placeholder
-                _authors.postValue(testAuthors)
+                _authors.postValue(authors)
             }
             _requestDuration.postValue(elapsed)
         }
@@ -44,18 +58,23 @@ class GraphQLRepository(private val scope : CoroutineScope, private val httpsUrl
             val elapsed = measureTimeMillis {
                 // TODO make the request to server
                 // fill _books LiveData with list of book of the author
+                val gson = Gson()
+                val query = "{findAuthorById(id: ${author.id}){id, name, books{id, title, publicationDate, authors{id, name}}}}"
+                val connection = URL(httpsUrl).openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.outputStream.use {
+                    it.write(gson.toJson(mapOf("query" to query)).toByteArray())
+                }
+
+                val response = connection.inputStream.bufferedReader(Charsets.UTF_8).readText()
+                val books = gson.fromJson(response, AuthorResponse::class.java).data.findAuthorById.books
 
                 //placeholder
-                _books.postValue(testBooks)
+                _books.postValue(books.orEmpty())
             }
             _requestDuration.postValue(elapsed)
         }
     }
-
-    companion object {
-        //placeholder data - to remove
-        private val testAuthors = listOf(Author(-1, "Test Author", emptyList()))
-        private val testBooks = listOf(Book(-1, "Test Title", "01.01.2024", testAuthors))
-    }
-
 }
