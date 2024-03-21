@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="4dp"
+    android:layout_width="match_parent"
+    android:layout_height="?listPreferredItemHeight">
+
+    <TextView
+        android:id="@+id/major"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        tools:text="maj"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rssi"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/minor"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        tools:text="min"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rssi"
+        app:layout_constraintStart_toEndOf="@+id/major" />
+
+    <TextView
+        android:id="@+id/uuid"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        tools:text="guid"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/minor"
+        app:layout_constraintBottom_toTopOf="@id/rssi"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/txpower"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/major"
+        tools:text="tx" />
+
+    <TextView
+        android:id="@+id/rssi"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/txpower"
+        app:layout_constraintTop_toBottomOf="@id/major"
+        tools:text="rssi" />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/rssi"
+        app:layout_constraintTop_toBottomOf="@id/major"
+        tools:text="distance" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

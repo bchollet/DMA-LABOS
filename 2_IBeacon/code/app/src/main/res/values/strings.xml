@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">dma-labo2</string>
+    <string name="location_title">Position</string>
+    <string name="beacons_list_title">Liste des balises</string>
+    <string name="no_beacons">Aucune balise à portée</string>
+    <string name="ble_unavailable">L\'utilisation des iBeacons nécessite que le Bluetooth soit activé</string>
+    <string name="ibeacon_feature_unavailable">L\'utilisation des iBeacons nécessite des permissions</string>
+    <string name="item_distance">%1$.2f m</string>
+    <string name="item_lastseen">%1$.2f s</string>
+</resources>
