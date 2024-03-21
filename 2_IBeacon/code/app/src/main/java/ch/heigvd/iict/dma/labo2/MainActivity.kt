@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,9 +14,15 @@ import androidx.activity.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.heigvd.iict.dma.labo2.databinding.ActivityMainBinding
+import org.altbeacon.beacon.Beacon
+import org.altbeacon.beacon.BeaconManager
+import org.altbeacon.beacon.BeaconParser
+import org.altbeacon.beacon.MonitorNotifier
+import org.altbeacon.beacon.RangeNotifier
+import org.altbeacon.beacon.Region
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RangeNotifier, MonitorNotifier {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -25,9 +32,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        val manager = BeaconManager.getInstanceForApplication(this)
+        manager.beaconParsers.add(BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"))
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         // check if bluetooth is enabled
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         try {
@@ -49,7 +59,11 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION))
         }
-
+        manager.addRangeNotifier(this)
+        manager.addMonitorNotifier(this)
+        manager.startMonitoring(Region("wildcardRegion", null, null, null))
+        manager.startRangingBeacons(Region("wildcardRegion", null, null, null))
+        manager.foregroundScanPeriod = 1100
         // init views
         val beaconAdapter = BeaconsAdapter()
         binding.beaconsList.adapter = beaconAdapter
@@ -58,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         // update views
         beaconsViewModel.closestBeacon.observe(this) {beacon ->
             if(beacon != null) {
-                binding.location.text = "TODO"
+                binding.location.text = "${beacon.major}.${beacon.minor}"
             } else {
                 binding.location.text = getString(R.string.no_beacons)
             }
@@ -96,5 +110,24 @@ class MainActivity : AppCompatActivity() {
                 permissionsGranted.postValue(false)
             }
         }
+
+    override fun didRangeBeaconsInRegion(beacons: MutableCollection<Beacon>?, region: Region?) {
+        beacons!!.forEach {
+            Log.d("didRange", it.id3.toString())
+        }
+    }
+
+    override fun didEnterRegion(region: Region?) {
+        Log.d("didEnter", region?.id3.toString())
+
+    }
+
+    override fun didExitRegion(region: Region?) {
+        Log.d("didExit", region?.id3.toString())
+    }
+
+    override fun didDetermineStateForRegion(state: Int, region: Region?) {
+        Log.d("didDet", region?.id3.toString())
+    }
 
 }
