@@ -14,6 +14,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import ch.heigvd.iict.dma.labo2.databinding.ActivityMainBinding
+import ch.heigvd.iict.dma.labo2.models.PersistentBeacon
 import org.altbeacon.beacon.Beacon
 import org.altbeacon.beacon.BeaconManager
 import org.altbeacon.beacon.BeaconParser
@@ -111,9 +112,10 @@ class MainActivity : AppCompatActivity(), RangeNotifier, MonitorNotifier {
             }
         }
 
+
     override fun didRangeBeaconsInRegion(beacons: MutableCollection<Beacon>?, region: Region?) {
-        beacons!!.forEach {
-            Log.d("didRange", it.id3.toString())
+        if (beacons != null) {
+            beaconsViewModel.setNearbyBeacons(beacons.map(PersistentBeacon.Companion::fromBeacon))
         }
     }
 

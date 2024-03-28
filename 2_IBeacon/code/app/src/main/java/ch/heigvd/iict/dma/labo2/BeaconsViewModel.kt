@@ -11,6 +11,11 @@ class BeaconsViewModel : ViewModel() {
 
     private val _nearbyBeacons = MutableLiveData(mutableListOf<PersistentBeacon>())
 
+    fun setNearbyBeacons(beacons: Iterable<PersistentBeacon>) {
+        _nearbyBeacons.postValue(beacons.toMutableList())
+    }
+
+
     /*
      *  Remarque
      *  Il est important que le contenu de la LiveData nearbyBeacons, écoutée par l'interface
