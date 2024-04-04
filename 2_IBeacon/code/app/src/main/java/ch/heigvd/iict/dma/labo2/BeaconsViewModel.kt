@@ -11,11 +11,6 @@ class BeaconsViewModel : ViewModel() {
 
     private val _nearbyBeacons = MutableLiveData(mutableListOf<PersistentBeacon>())
 
-    fun setNearbyBeacons(beacons: Iterable<PersistentBeacon>) {
-        _nearbyBeacons.postValue(beacons.toMutableList())
-    }
-
-
     /*
      *  Remarque
      *  Il est important que le contenu de la LiveData nearbyBeacons, écoutée par l'interface
@@ -37,7 +32,14 @@ class BeaconsViewModel : ViewModel() {
      */
     val nearbyBeacons : LiveData<List<PersistentBeacon>> = _nearbyBeacons.map { l -> l.toList().map { el -> el.copy() } }
 
-    private val _closestBeacon = MutableLiveData<PersistentBeacon?>(null)
+    private val _closestBeacon = nearbyBeacons.map { nearbyBeacons ->
+        nearbyBeacons.minByOrNull { it.distance }
+    }
     val closestBeacon : LiveData<PersistentBeacon?> get() = _closestBeacon
 
+    val myBeacons : Map<Int, String> = mapOf(45 to "Chambre", 15 to "Couloir")
+
+    fun setNearbyBeacons(beacons: Iterable<PersistentBeacon>) {
+        _nearbyBeacons.postValue(beacons.toMutableList())
+    }
 }
