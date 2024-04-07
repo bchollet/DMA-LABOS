@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity(), RangeNotifier {
         super.onDestroy()
         BeaconManager.getInstanceForApplication(this).stopRangingBeacons(scanRegion)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -58,7 +59,6 @@ class MainActivity : AppCompatActivity(), RangeNotifier {
                 manager.startRangingBeacons(scanRegion)
                 manager.foregroundScanPeriod = 1100
             }
-
         }
 
         // we request permissions

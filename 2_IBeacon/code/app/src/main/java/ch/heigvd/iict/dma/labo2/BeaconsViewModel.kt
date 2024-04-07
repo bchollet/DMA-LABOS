@@ -12,7 +12,7 @@ class BeaconsViewModel : ViewModel() {
 
     private val _nearbyBeacons = MutableLiveData(mutableMapOf<Int, PersistentBeacon>())
     companion object {
-        val TIMEOUT_BEACONS_SECONDS: Long = 30
+        const val TIMEOUT_BEACONS_SECONDS: Long = 30
     }
     val nearbyBeacons : LiveData<List<PersistentBeacon>> = _nearbyBeacons.map { beaconsMap ->
         beaconsMap.values.map { it.copy()}
