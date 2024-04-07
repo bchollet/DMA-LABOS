@@ -2,6 +2,7 @@ package ch.heigvd.iict.dma.labo2.models
 
 import androidx.recyclerview.widget.DiffUtil
 import org.altbeacon.beacon.Beacon
+import java.time.Instant
 import java.util.*
 
 /*
@@ -14,6 +15,7 @@ data class PersistentBeacon(
     var uuid: UUID,
     var rssi : Int,
     var txPower : Int,
+    var lastAppeared : Instant = Instant.now(),
     var distance : Double) {
 
     companion object {
