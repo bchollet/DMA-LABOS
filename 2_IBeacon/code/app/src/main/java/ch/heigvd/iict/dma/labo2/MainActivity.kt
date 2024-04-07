@@ -23,20 +23,21 @@ import org.altbeacon.beacon.RangeNotifier
 import org.altbeacon.beacon.Region
 
 
-class MainActivity : AppCompatActivity(), RangeNotifier, MonitorNotifier {
+class MainActivity : AppCompatActivity(), RangeNotifier {
 
     private lateinit var binding: ActivityMainBinding
 
     private val beaconsViewModel: BeaconsViewModel by viewModels()
 
     private val permissionsGranted = MutableLiveData(false)
-
+    private val scanRegion = Region("wildcardRegion", null, null, null)
+    override fun onDestroy() {
+        super.onDestroy()
+        BeaconManager.getInstanceForApplication(this).stopRangingBeacons(scanRegion)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-        val manager = BeaconManager.getInstanceForApplication(this)
-        manager.beaconParsers.add(BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"))
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         // check if bluetooth is enabled
@@ -47,6 +48,17 @@ class MainActivity : AppCompatActivity(), RangeNotifier, MonitorNotifier {
                 finish()
             }
         } catch (_: java.lang.Exception) { /* getAdapter can launch exception on some smartphone models if permission are not yet granted */
+        }
+
+        permissionsGranted.observe(this) {permGranted ->
+            if (permGranted) {
+                val manager = BeaconManager.getInstanceForApplication(this)
+                manager.beaconParsers.add(BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"))
+                manager.addRangeNotifier(this)
+                manager.startRangingBeacons(scanRegion)
+                manager.foregroundScanPeriod = 1100
+            }
+
         }
 
         // we request permissions
@@ -66,11 +78,8 @@ class MainActivity : AppCompatActivity(), RangeNotifier, MonitorNotifier {
                 )
             )
         }
-        manager.addRangeNotifier(this)
-        manager.addMonitorNotifier(this)
-        manager.startMonitoring(Region("wildcardRegion", null, null, null))
-        manager.startRangingBeacons(Region("wildcardRegion", null, null, null))
-        manager.foregroundScanPeriod = 1100
+
+
         // init views
         val beaconAdapter = BeaconsAdapter()
         binding.beaconsList.adapter = beaconAdapter
@@ -131,17 +140,5 @@ class MainActivity : AppCompatActivity(), RangeNotifier, MonitorNotifier {
         }
     }
 
-    override fun didEnterRegion(region: Region?) {
-        Log.d("didEnter", region?.id3.toString())
-
-    }
-
-    override fun didExitRegion(region: Region?) {
-        Log.d("didExit", region?.id3.toString())
-    }
-
-    override fun didDetermineStateForRegion(state: Int, region: Region?) {
-        Log.d("didDet", region?.id3.toString())
-    }
 
 }

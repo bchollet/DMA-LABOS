@@ -9,7 +9,7 @@ import ch.heigvd.iict.dma.labo2.models.PersistentBeacon
 
 class BeaconsViewModel : ViewModel() {
 
-    private val _nearbyBeacons = MutableLiveData(mutableListOf<PersistentBeacon>())
+    private val _nearbyBeacons = MutableLiveData(mutableMapOf<Int, PersistentBeacon>())
 
     /*
      *  Remarque
@@ -30,7 +30,9 @@ class BeaconsViewModel : ViewModel() {
      *  La solution présentée ici est de réaliser une projection d'une MutableList vers une List et
      *  une copie profonde de toutes les instances de PersistentBeacon qu'elle contient.
      */
-    val nearbyBeacons : LiveData<List<PersistentBeacon>> = _nearbyBeacons.map { l -> l.toList().map { el -> el.copy() } }
+    val nearbyBeacons : LiveData<List<PersistentBeacon>> = _nearbyBeacons.map { beaconsMap ->
+        beaconsMap.values.map { it.copy()}
+    }
 
     private val _closestBeacon = nearbyBeacons.map { nearbyBeacons ->
         nearbyBeacons.minByOrNull { it.distance }
@@ -40,6 +42,10 @@ class BeaconsViewModel : ViewModel() {
     val myBeacons : Map<Int, String> = mapOf(45 to "Chambre", 15 to "Couloir")
 
     fun setNearbyBeacons(beacons: Iterable<PersistentBeacon>) {
-        _nearbyBeacons.postValue(beacons.toMutableList())
+        val newBeacons = _nearbyBeacons.value!!
+        beacons.forEach {
+            newBeacons[it.minor] = it;
+        }
+        _nearbyBeacons.postValue(newBeacons)
     }
 }
