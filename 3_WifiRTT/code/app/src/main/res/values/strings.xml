@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">DMA - WifiRTT</string>
+    <string name="title_list">List</string>
+    <string name="title_map">Map</string>
+    <string name="debug">Debug</string>
+    <string name="map_ctn_desc">map of the floor</string>
+    <string name="wifi_rtt_unavailable">WifiRTT not available or missing permissions</string>
+    <string name="wifi_rtt_disabled">WifiRTT not enabled</string>
+    <string name="wifi_rtt_not_in_range">No WifiRTT compatible access point in range</string>
+    <string name="display_distance">%1$.2f [m]</string>
+    <string name="display_age">%1$d [ms]</string>
+</resources>

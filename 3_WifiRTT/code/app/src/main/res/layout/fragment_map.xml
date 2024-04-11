@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    tools:context=".ui.map.MapFragment" >
+
+    <ImageView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/map_ctn_desc"
+        android:scaleType="centerInside"/>
+
+    <ch.heigvd.iict.dma.wifirtt.ui.views.MapOverlayView
+        android:id="@+id/map_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="@id/map"
+        app:layout_constraintBottom_toBottomOf="@id/map"
+        app:layout_constraintStart_toStartOf="@id/map"
+        app:layout_constraintEnd_toEndOf="@id/map" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/map_debug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/debug"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
