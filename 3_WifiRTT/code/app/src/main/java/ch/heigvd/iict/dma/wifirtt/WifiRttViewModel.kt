@@ -1,6 +1,5 @@
 package ch.heigvd.iict.dma.wifirtt
 
-import android.content.res.TypedArray
 import android.net.wifi.rtt.RangingResult
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -38,8 +37,7 @@ class WifiRttViewModel : ViewModel() {
         _rangedAccessPoints.map { l -> l.toList().map { el -> el.copy() } }
 
     // CONFIGURATION MANAGEMENT
-    // TODO change map here
-    private val _mapConfig = MutableLiveData(MapConfigs.levelB)
+    private val _mapConfig = MutableLiveData(MapConfigs.b30)
     val mapConfig: LiveData<MapConfig> get() = _mapConfig
 
     fun onNewRangingResults(newResults: List<RangingResult>) {
