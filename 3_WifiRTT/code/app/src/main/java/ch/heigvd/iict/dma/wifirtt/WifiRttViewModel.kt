@@ -59,7 +59,7 @@ class WifiRttViewModel : ViewModel() {
         _rangedAccessPoints.postValue(newState)
 
         // when the list is updated, we also want to update estimated location
-        estimateLocation(newState)
+        estimateLocation()
     }
 
     // WIFI RTT ACCESS POINT LOCATIONS
@@ -78,38 +78,19 @@ class WifiRttViewModel : ViewModel() {
         _debug.postValue(debug)
     }
 
-    private fun estimateLocation(rangedAccessPoints: List<RangedAccessPoint>) {
-        // Get positions of each access point
-//        val positions = mapConfig.value!!.accessPointKnownLocations.values
-//            .sortedBy { it.macAddress }
-//            .map { doubleArrayOf(it.xMm.toDouble(), it.yMm.toDouble()) }
-//            .toTypedArray()
+    private fun estimateLocation() {
 
+        val rangedAccessPoints = _rangedAccessPoints.value!!
 
-        val positions =
-            rangedAccessPoints.map { mapConfig.value!!.accessPointKnownLocations[it.bssid] }
-            .map { doubleArrayOf(it!!.xMm.toDouble(), it.yMm.toDouble()) }
-            .toTypedArray()
-
-        // Get distances of each access point from rangedAccessPoints
         val distances = rangedAccessPoints
-//            .sortedBy { it.bssid }
-//            .filter { mapConfig.value!!.accessPointKnownLocations.keys.contains(it.bssid) }
+            .filter { it.bssid in mapConfig.value!!.accessPointKnownLocations.keys}
             .map { it.distanceMm }
             .toDoubleArray()
 
-//        var positions: Array<DoubleArray>
-//
-//        val distances = rangedAccessPoints.value!!
-//            .sortedBy { it.bssid }
-//            .forEach {
-//                val accessPoint = mapConfig.value!!.accessPointKnownLocations.get(it.bssid)
-//                    positions = arrayOf(doubleArrayOf(accessPoint!!.xMm.toDouble(), accessPoint.yMm.toDouble()))
-//            }
-//            .filter { mapConfig.value!!.accessPointKnownLocations.keys.contains(it.bssid) }
-//            .map { it.distanceMm }
-//            .toDoubleArray()
-
+        val positions =
+            rangedAccessPoints.mapNotNull { mapConfig.value!!.accessPointKnownLocations[it.bssid] }
+            .map { doubleArrayOf(it.xMm.toDouble(), it.yMm.toDouble()) }
+            .toTypedArray()
 
         if(distances.size < 3)
             return
