@@ -1,6 +1,7 @@
 package ch.heigvd.iict.dma.wifirtt
 
 import android.net.wifi.rtt.RangingResult
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +16,7 @@ import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer
 
 class WifiRttViewModel : ViewModel() {
 
+    private val maxAgeMs = 15000;
     // PERMISSIONS MANAGEMENT
     private val _wifiRttPermissionsGranted = MutableLiveData<Boolean>(null)
     val wifiRttPermissionsGranted: LiveData<Boolean> get() = _wifiRttPermissionsGranted
@@ -44,6 +46,7 @@ class WifiRttViewModel : ViewModel() {
         val newState = mutableListOf<RangedAccessPoint>()
         // existing ones
         newResults.forEach { rangingResult ->
+
             val existingAp = _rangedAccessPoints.value!!
                 .find { it.bssid == rangingResult.macAddress.toString() }
 
@@ -52,7 +55,18 @@ class WifiRttViewModel : ViewModel() {
             } else {
                 existingAp.update(rangingResult)
                 newState.add(existingAp)
+
             }
+        }
+
+        // remove old access points and add missing ones
+        _rangedAccessPoints.value!!
+            .filter { ap -> newResults.find { it.macAddress.toString() == ap.bssid } == null} // keep only those who haven't been updated
+            .forEach {
+                if (System.currentTimeMillis() - it.age <= maxAgeMs) {
+                    // Keep only the youngest ones
+                    newState.add(it)
+                }
         }
         _rangedAccessPoints.postValue(newState)
 
