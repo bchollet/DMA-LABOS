@@ -86,9 +86,6 @@ class MainActivity : AppCompatActivity() {
 
     private var rangingTask : Timer? = null
 
-     fun x(mesCouilles: String) {
-
-    }
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("MissingPermission")
     override fun onStart() {
@@ -108,7 +105,6 @@ class MainActivity : AppCompatActivity() {
                         val req = RangingRequest.Builder().addAccessPoints(apsInRange).build()
                         wifiRttManager.startRanging(req, mainExecutor, object : RangingResultCallback() {
                             override fun onRangingResults(results: List<RangingResult>) {
-
                                 wifiRttViewModel.onNewRangingResults(results.filter { it.status == STATUS_SUCCESS })
                             }
                             override fun onRangingFailure(code: Int) { }

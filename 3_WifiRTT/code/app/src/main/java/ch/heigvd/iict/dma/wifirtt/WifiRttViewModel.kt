@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import ch.heigvd.iict.dma.wifirtt.config.MapConfig
 import ch.heigvd.iict.dma.wifirtt.config.MapConfigs
-import ch.heigvd.iict.dma.wifirtt.config.MapConfigs.b30
 import ch.heigvd.iict.dma.wifirtt.models.RangedAccessPoint
 import com.lemmingapex.trilateration.NonLinearLeastSquaresSolver
 import com.lemmingapex.trilateration.TrilaterationFunction
