@@ -14,9 +14,8 @@ object MapConfigs {
         (3087 * b30mmPerPx).roundToInt(),
         (1912 * b30mmPerPx).roundToInt(),
         mapOf(
-            // FIXME set the correct position of AP <24:e5:0f:08:17:a9> - B30 (fenêtres)
             "bc:df:58:f2:f7:b4" to  AccessPointLocation("bc:df:58:f2:f7:b4", originShift.first +  470, originShift.second + 11330), // B30 (armoire)
-            "24:e5:0f:08:17:a9" to  AccessPointLocation("24:e5:0f:08:17:a9", 4500, 6500), // B30 (fenêtres)
+            "24:e5:0f:08:17:a9" to  AccessPointLocation("24:e5:0f:08:17:a9", 1684, 3868), // B30 (fenêtres)
             "24:e5:0f:08:5c:19" to  AccessPointLocation("24:e5:0f:08:5c:19", originShift.first + 7080, originShift.second + 11620), // B30 (arrière)
         )
     )
