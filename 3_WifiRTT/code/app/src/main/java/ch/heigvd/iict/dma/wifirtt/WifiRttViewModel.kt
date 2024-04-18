@@ -62,7 +62,7 @@ class WifiRttViewModel : ViewModel() {
 
         // remove old access points and add missing ones
         _rangedAccessPoints.value!!
-            .filter { ap -> newState.find { it.bssid == ap.bssid } == null}
+            .filter { ap -> newResults.find { it.macAddress.toString() == ap.bssid } == null} // keep only those who haven't been updated
             .forEach {
                 if (System.currentTimeMillis() - it.age <= maxAgeMs) {
                     // Keep only the youngest ones
