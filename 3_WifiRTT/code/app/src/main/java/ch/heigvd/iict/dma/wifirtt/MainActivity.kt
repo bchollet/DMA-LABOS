@@ -100,7 +100,10 @@ class MainActivity : AppCompatActivity() {
                 rangingTask?.cancel() // we cancel eventual previous task
                 rangingTask =
                     timer("ranging_timer", daemon = false, initialDelay = 500, period = 1000) {
-                        val apsInRange = wifiManager.scanResults.take(RangingRequest.getMaxPeers())
+                        val apsInRange = wifiManager
+                            .scanResults
+                            .filter { it.is80211mcResponder }
+                            .take(RangingRequest.getMaxPeers())
 
                         val req = RangingRequest.Builder().addAccessPoints(apsInRange).build()
                         wifiRttManager.startRanging(req, mainExecutor, object : RangingResultCallback() {
