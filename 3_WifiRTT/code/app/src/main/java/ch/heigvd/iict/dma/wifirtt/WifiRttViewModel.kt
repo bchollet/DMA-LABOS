@@ -1,6 +1,7 @@
 package ch.heigvd.iict.dma.wifirtt
 
 import android.net.wifi.rtt.RangingResult
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -40,14 +41,14 @@ class WifiRttViewModel : ViewModel() {
         val newState = mutableListOf<RangedAccessPoint>()
         // existing ones
         newResults.forEach {rangingResult ->
-            _rangedAccessPoints.value!!.forEach{ap ->
-                // Existing ones
-                if (ap.bssid == rangingResult.macAddress.toString()) {
-                    ap.update(rangingResult)
-                    newState.add(ap)
-                } else { // new ones
-                    newState.add(RangedAccessPoint.newInstance(rangingResult))
-                }
+            val existingAp = _rangedAccessPoints.value!!
+                .find { it.bssid == rangingResult.macAddress.toString() }
+
+            if (existingAp == null) {
+                newState.add(RangedAccessPoint.newInstance(rangingResult))
+            } else {
+                existingAp.update(rangingResult)
+                newState.add(existingAp)
             }
         }
         _rangedAccessPoints.postValue(newState)

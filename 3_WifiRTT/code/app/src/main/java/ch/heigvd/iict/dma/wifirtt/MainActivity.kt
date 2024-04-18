@@ -99,12 +99,13 @@ class MainActivity : AppCompatActivity() {
             if(isEnabled) {
                 rangingTask?.cancel() // we cancel eventual previous task
                 rangingTask =
-                    timer("ranging_timer", daemon = false, initialDelay = 500, period = 250) {
+                    timer("ranging_timer", daemon = false, initialDelay = 500, period = 1000) {
                         val apsInRange = wifiManager.scanResults.take(RangingRequest.getMaxPeers())
 
                         val req = RangingRequest.Builder().addAccessPoints(apsInRange).build()
                         wifiRttManager.startRanging(req, mainExecutor, object : RangingResultCallback() {
                             override fun onRangingResults(results: List<RangingResult>) {
+
                                 wifiRttViewModel.onNewRangingResults(results.filter { it.status == STATUS_SUCCESS })
                             }
                             override fun onRangingFailure(code: Int) { }
