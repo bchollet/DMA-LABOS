@@ -37,8 +37,20 @@ class WifiRttViewModel : ViewModel() {
     val mapConfig : LiveData<MapConfig> get() = _mapConfig
 
     fun onNewRangingResults(newResults : List<RangingResult>) {
-        //TODO we need to update encapsulated list of <RangedAccessPoint> in
-        _rangedAccessPoints
+        val newState = mutableListOf<RangedAccessPoint>()
+        // existing ones
+        newResults.forEach {rangingResult ->
+            _rangedAccessPoints.value!!.forEach{ap ->
+                // Existing ones
+                if (ap.bssid == rangingResult.macAddress.toString()) {
+                    ap.update(rangingResult)
+                    newState.add(ap)
+                } else { // new ones
+                    newState.add(RangedAccessPoint.newInstance(rangingResult))
+                }
+            }
+        }
+        _rangedAccessPoints.postValue(newState)
 
         // when the list is updated, we also want to update estimated location
         estimateLocation()

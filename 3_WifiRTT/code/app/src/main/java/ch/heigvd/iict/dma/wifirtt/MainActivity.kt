@@ -1,20 +1,29 @@
 package ch.heigvd.iict.dma.wifirtt
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
+import android.net.wifi.rtt.RangingRequest
+import android.net.wifi.rtt.RangingResult
+import android.net.wifi.rtt.RangingResult.STATUS_SUCCESS
+import android.net.wifi.rtt.RangingResultCallback
 import android.net.wifi.rtt.WifiRttManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import ch.heigvd.iict.dma.wifirtt.config.MapConfigs
 import ch.heigvd.iict.dma.wifirtt.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.Timer
@@ -77,6 +86,11 @@ class MainActivity : AppCompatActivity() {
 
     private var rangingTask : Timer? = null
 
+     fun x(mesCouilles: String) {
+
+    }
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @SuppressLint("MissingPermission")
     override fun onStart() {
         super.onStart()
         // 3. we start ranging
@@ -86,10 +100,16 @@ class MainActivity : AppCompatActivity() {
                 rangingTask?.cancel() // we cancel eventual previous task
                 rangingTask =
                     timer("ranging_timer", daemon = false, initialDelay = 500, period = 250) {
-                        //TODO implement ranging with
-                        wifiRttManager
-                        // valid ranging results should be pass to viewmodel using
-                        wifiRttViewModel.onNewRangingResults(emptyList())
+                        val apsInRange = wifiManager.scanResults.take(RangingRequest.getMaxPeers())
+
+                        val req = RangingRequest.Builder().addAccessPoints(apsInRange).build()
+                        wifiRttManager.startRanging(req, mainExecutor, object : RangingResultCallback() {
+                            override fun onRangingResults(results: List<RangingResult>) {
+                                wifiRttViewModel.onNewRangingResults(results.filter { it.status == STATUS_SUCCESS })
+                            }
+                            override fun onRangingFailure(code: Int) { }
+                        })
+
                     }
             }
         }
