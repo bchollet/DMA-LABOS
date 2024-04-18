@@ -2,6 +2,7 @@ package ch.heigvd.iict.dma.wifirtt
 
 import android.content.res.TypedArray
 import android.net.wifi.rtt.RangingResult
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -69,7 +70,6 @@ class WifiRttViewModel : ViewModel() {
                     newState.add(it)
                 }
         }
-
         _rangedAccessPoints.postValue(newState)
 
         // when the list is updated, we also want to update estimated location
