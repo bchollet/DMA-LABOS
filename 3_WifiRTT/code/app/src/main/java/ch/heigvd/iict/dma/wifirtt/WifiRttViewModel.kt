@@ -1,7 +1,7 @@
 package ch.heigvd.iict.dma.wifirtt
 
+import android.content.res.TypedArray
 import android.net.wifi.rtt.RangingResult
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -39,7 +39,7 @@ class WifiRttViewModel : ViewModel() {
 
     // CONFIGURATION MANAGEMENT
     // TODO change map here
-    private val _mapConfig = MutableLiveData(MapConfigs.b30)
+    private val _mapConfig = MutableLiveData(MapConfigs.levelB)
     val mapConfig: LiveData<MapConfig> get() = _mapConfig
 
     fun onNewRangingResults(newResults: List<RangingResult>) {
@@ -59,7 +59,7 @@ class WifiRttViewModel : ViewModel() {
         _rangedAccessPoints.postValue(newState)
 
         // when the list is updated, we also want to update estimated location
-        estimateLocation()
+        estimateLocation(newState)
     }
 
     // WIFI RTT ACCESS POINT LOCATIONS
@@ -78,19 +78,38 @@ class WifiRttViewModel : ViewModel() {
         _debug.postValue(debug)
     }
 
-    private fun estimateLocation() {
+    private fun estimateLocation(rangedAccessPoints: List<RangedAccessPoint>) {
         // Get positions of each access point
-        val positions = mapConfig.value!!.accessPointKnownLocations.values
-            .sortedBy { it.macAddress }
-            .map { doubleArrayOf(it.xMm.toDouble(), it.yMm.toDouble()) }
+//        val positions = mapConfig.value!!.accessPointKnownLocations.values
+//            .sortedBy { it.macAddress }
+//            .map { doubleArrayOf(it.xMm.toDouble(), it.yMm.toDouble()) }
+//            .toTypedArray()
+
+
+        val positions =
+            rangedAccessPoints.map { mapConfig.value!!.accessPointKnownLocations[it.bssid] }
+            .map { doubleArrayOf(it!!.xMm.toDouble(), it.yMm.toDouble()) }
             .toTypedArray()
 
         // Get distances of each access point from rangedAccessPoints
-        val distances = rangedAccessPoints.value!!
-            .sortedBy { it.bssid }
-            .filter { mapConfig.value!!.accessPointKnownLocations.keys.contains(it.bssid) }
+        val distances = rangedAccessPoints
+//            .sortedBy { it.bssid }
+//            .filter { mapConfig.value!!.accessPointKnownLocations.keys.contains(it.bssid) }
             .map { it.distanceMm }
             .toDoubleArray()
+
+//        var positions: Array<DoubleArray>
+//
+//        val distances = rangedAccessPoints.value!!
+//            .sortedBy { it.bssid }
+//            .forEach {
+//                val accessPoint = mapConfig.value!!.accessPointKnownLocations.get(it.bssid)
+//                    positions = arrayOf(doubleArrayOf(accessPoint!!.xMm.toDouble(), accessPoint.yMm.toDouble()))
+//            }
+//            .filter { mapConfig.value!!.accessPointKnownLocations.keys.contains(it.bssid) }
+//            .map { it.distanceMm }
+//            .toDoubleArray()
+
 
         if(distances.size < 3)
             return
@@ -109,7 +128,7 @@ class WifiRttViewModel : ViewModel() {
         _estimatedPosition.postValue(doubleArrayOf( centroid[0], centroid[1], 0.0))
 
         //as well as the distances with each access point as a MutableMap<String, Double>
-        val estimatedDistances = rangedAccessPoints.value!!
+        val estimatedDistances = rangedAccessPoints
             .associateBy({ it.bssid }, { it.distanceMm })
             .toMutableMap()
 
