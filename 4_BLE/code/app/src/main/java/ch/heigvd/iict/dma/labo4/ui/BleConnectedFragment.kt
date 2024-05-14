@@ -2,6 +2,7 @@ package ch.heigvd.iict.dma.labo4.ui
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
@@ -59,9 +60,16 @@ class BleConnectedFragment : Fragment(), MenuProvider {
 
         // sending a number
         binding.sendButtonClick.setOnClickListener {
-            if (binding.numberToSend.text.isNotEmpty()) {
-                bleViewModel.sendValue(Integer.valueOf(binding.numberToSend.text.toString()))
+            if (binding.numberToSend.text.isEmpty()) {
+                return@setOnClickListener
             }
+
+            if (bleViewModel.sendValue(Integer.valueOf(binding.numberToSend.text.toString()))) {
+                Toast.makeText(context, "Nombre correctement envoyé !", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Erreur lors de l'envoi :(", Toast.LENGTH_SHORT).show()
+            }
+
         }
     }
 
