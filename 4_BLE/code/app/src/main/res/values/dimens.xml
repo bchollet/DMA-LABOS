@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacer_size">142dp</dimen>
+    <dimen name="layout_margin">30dp</dimen>
+    <dimen name="guideline_position">175dp</dimen>
+    <dimen name="fragment_connected_margin">40dp</dimen>
+    <dimen name="guideline_pos">125dp</dimen>
+</resources>

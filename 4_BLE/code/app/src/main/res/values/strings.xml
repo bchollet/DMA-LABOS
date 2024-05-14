@@ -14,5 +14,12 @@
     <string name="ble_temperature_read">Read</string>
     <string name="ble_sendvalue_title">Envoi de valeur</string>
     <string name="ble_sendvalue_send">Send</string>
+    <string name="clicks_count">Nbre de clics :</string>
+    <string name="temp_label">Température :</string>
+    <string name="current_time_label">Heure actuelle</string>
+    <string name="click_label">Nombre de clicks :</string>
+    <string name="update_time_btn">Mettre à jour l\'heure</string>
+    <string name="envoyer_le_nombre">Envoyer le nombre</string>
+    <string name="read_temp">Lire la température</string>
 
 </resources>

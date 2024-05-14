@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import ch.heigvd.iict.dma.labo4.R
 import ch.heigvd.iict.dma.labo4.databinding.FragmentConnectedBinding
 import ch.heigvd.iict.dma.labo4.viewmodels.BleViewModel
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
 class BleConnectedFragment : Fragment(), MenuProvider {
 
@@ -25,7 +28,37 @@ class BleConnectedFragment : Fragment(), MenuProvider {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // TODO implement connected fragment
+
+        // Buttons click counts
+        bleViewModel.buttonClick.observe(viewLifecycleOwner) {
+            binding.clicksValue.text = "$it"
+        }
+
+        // reading the temperature
+        bleViewModel.temperature.observe(viewLifecycleOwner) {
+            binding.tempValue.text = "$it"
+        }
+
+        // asking for temperature
+        binding.readTempBtn.setOnClickListener {
+            bleViewModel.readTemperature()
+        }
+
+        // time writing
+        binding.updateTimeBtn.setOnClickListener {
+            // send the current time
+            bleViewModel.setTime()
+        }
+
+        // time reading
+        bleViewModel.currentTime.observe(viewLifecycleOwner) {
+            binding.tempValue.text = SimpleDateFormat.getTimeInstance().format(it)
+        }
+
+        // sending a number
+        binding.sendButtonClick.setOnClickListener {
+            bleViewModel.sendValue(binding.numberToSend.value)
+        }
     }
 
     override fun onResume() {

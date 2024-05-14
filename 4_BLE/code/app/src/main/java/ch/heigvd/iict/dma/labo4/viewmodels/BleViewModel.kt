@@ -25,6 +25,7 @@ class BleViewModel(application: Application) : AndroidViewModel(application), DM
         _blePermissionsGranted.postValue(granted)
     }
 
+
     /*
      *  SCAN
      */

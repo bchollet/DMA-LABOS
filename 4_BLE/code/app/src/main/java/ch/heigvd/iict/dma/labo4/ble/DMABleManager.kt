@@ -6,10 +6,12 @@ import android.bluetooth.BluetoothGattService
 import android.content.Context
 import android.util.Log
 import no.nordicsemi.android.ble.BleManager
+import no.nordicsemi.android.ble.ktx.getCharacteristic
 import java.util.*
 
 class DMABleManager(applicationContext: Context, private val dmaServiceListener: DMAServiceListener? = null) : BleManager(applicationContext) {
 
+    private var clickCount: Int = 0;
     //Services and Characteristics of the SYM Pixl
     private var timeService: BluetoothGattService? = null
     private var symService: BluetoothGattService? = null
@@ -18,31 +20,53 @@ class DMABleManager(applicationContext: Context, private val dmaServiceListener:
     private var temperatureChar: BluetoothGattCharacteristic? = null
     private var buttonClickChar: BluetoothGattCharacteristic? = null
 
+    private val timeServiceGuid: UUID = UUID.fromString("00001805-0000-1000-8000-00805f9b34fb")
+    private val currentTimeCharUuid: UUID = UUID.fromString("00002A2B-0000-1000-8000-00805f9b34fb")
+    private val symServiceGuid: UUID = getCustomServiceUuid(0)
+    private val integerCharUuid: UUID = getCustomServiceUuid(1)
+    private val temperatureCharUuid: UUID = getCustomServiceUuid(2)
+    private val buttonClickCharUuid: UUID = getCustomServiceUuid(3)
+
+    private fun getCustomServiceUuid(discriminator: Int): UUID {
+        return UUID.fromString("3c0a100$discriminator-281d-4b48-b2a7-f15579a1c38f")
+    }
+
     fun requestDisconnection() {
         this.disconnect().enqueue()
     }
 
     override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
-
-        Log.d(TAG, "isRequiredServiceSupported - discovered services:")
         for (service in gatt.services) {
-            Log.d(TAG, service.uuid.toString())
+            if (service.uuid == symServiceGuid) {
+                symService = service
+            }
+            if (service.uuid == timeServiceGuid) {
+                timeService = service
+            }
         }
 
-        /* TODO
-        - Nous devons vérifier ici que le périphérique auquel on vient de se connecter possède
-          bien tous les services et les caractéristiques attendus, on vérifiera aussi que les
-          caractéristiques présentent bien les opérations attendues
-        - On en profitera aussi pour garder les références vers les différents services et
-          caractéristiques (déclarés en lignes 14 à 19)
-        */
+        if (symService == null || timeService == null) {
+            return  false;
+        }
 
-        return false //FIXME si tout est OK, on doit retourner true
-        // sinon la librairie appelera la méthode onDeviceDisconnected() avec le flag REASON_NOT_SUPPORTED
+        currentTimeChar = timeService!!.getCharacteristic(currentTimeCharUuid) ?: return false
+        temperatureChar = symService!!.getCharacteristic(temperatureCharUuid) ?: return false
+        integerChar = symService!!.getCharacteristic(integerCharUuid) ?: return false
+        buttonClickChar = symService!!.getCharacteristic(buttonClickCharUuid) ?: return false
+
+
+        return true
     }
 
     override fun initialize() {
         super.initialize()
+
+        setNotificationCallback(buttonClickChar).with { device, data ->
+            clickCount++
+            dmaServiceListener?.clickCountUpdate(clickCount)
+        }
+        enableNotifications(buttonClickChar).enqueue()
+
         /* TODO
             Ici nous somme sûr que le périphérique possède bien tous les services et caractéristiques
             attendus et que nous y sommes connectés. Nous pouvous effectuer les premiers échanges BLE.
@@ -64,6 +88,7 @@ class DMABleManager(applicationContext: Context, private val dmaServiceListener:
     }
 
     fun readTemperature(): Boolean {
+        readCharacteristic(temperatureChar).with { device, data -> Log.d(TAG, "readTemp") }.enqueue()
         /* TODO
             on peut effectuer ici la lecture de la caractéristique température
             la valeur récupérée sera envoyée à au ViewModel en utilisant le mécanisme
