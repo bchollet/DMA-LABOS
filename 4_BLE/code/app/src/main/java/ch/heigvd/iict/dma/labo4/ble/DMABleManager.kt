@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGattService
 import android.content.Context
 import android.util.Log
 import no.nordicsemi.android.ble.BleManager
+import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.ktx.getCharacteristic
 import java.util.*
 
@@ -85,6 +86,16 @@ class DMABleManager(applicationContext: Context, private val dmaServiceListener:
         integerChar = null
         temperatureChar = null
         buttonClickChar = null
+    }
+
+    fun sendTime(time: Date): Boolean {
+        // TODO
+        return true
+    }
+
+    fun sendNumber(n: Int) {
+        writeCharacteristic(integerChar, n.toBigInteger().toByteArray(),
+            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT).enqueue()
     }
 
     fun readTemperature(): Boolean {

@@ -52,12 +52,16 @@ class BleConnectedFragment : Fragment(), MenuProvider {
 
         // time reading
         bleViewModel.currentTime.observe(viewLifecycleOwner) {
-            binding.tempValue.text = SimpleDateFormat.getTimeInstance().format(it)
+            if (it != null) {
+                binding.tempValue.text = SimpleDateFormat.getTimeInstance().format(it.time)
+            }
         }
 
         // sending a number
         binding.sendButtonClick.setOnClickListener {
-            bleViewModel.sendValue(binding.numberToSend.value)
+            if (binding.numberToSend.text.isNotEmpty()) {
+                bleViewModel.sendValue(Integer.valueOf(binding.numberToSend.text.toString()))
+            }
         }
     }
 

@@ -58,14 +58,17 @@
         app:layout_constraintStart_toEndOf="@id/current_time_label"
         />
 
-    <NumberPicker
+    <EditText
+        android:hint="@string/number"
+        android:inputType="number"
         android:id="@+id/number_to_send"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/update_time_btn"
         app:layout_constraintEnd_toStartOf="@id/send_button_click"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/send_button_click" />
+        app:layout_constraintTop_toTopOf="@+id/send_button_click"
+         />
 
     <Button
         android:id="@+id/send_button_click"

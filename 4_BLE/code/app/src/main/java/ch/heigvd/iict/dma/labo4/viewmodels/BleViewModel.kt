@@ -92,14 +92,13 @@ class BleViewModel(application: Application) : AndroidViewModel(application), DM
     //
     fun setTime(): Boolean {
         if (!isConnected.value!!) return false
-        // TODO send a current datetime value
-        return false
+        return ble.sendTime(Calendar.getInstance().time)
     }
 
     fun sendValue(value: Int): Boolean {
         if (!isConnected.value!!) return false
-        // TODO send a int value
-        return false
+        ble.sendNumber(value)
+        return true
     }
 
     fun readTemperature(): Boolean {

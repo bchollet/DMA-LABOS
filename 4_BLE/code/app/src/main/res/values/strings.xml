@@ -21,5 +21,6 @@
     <string name="update_time_btn">Mettre à jour l\'heure</string>
     <string name="envoyer_le_nombre">Envoyer le nombre</string>
     <string name="read_temp">Lire la température</string>
+    <string name="number">Nombre</string>
 
 </resources>
