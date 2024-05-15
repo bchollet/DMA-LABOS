@@ -15,4 +15,4 @@ des entiers est une solution possible pour contourner ces contraintes, et pourra
 
 ## Question 5.2
 
-Ololol ptdr je m'apèl KEVIN et jeu c pa la dif entr température et temps nulnulnulnulnul
+Le service est `Battery Service`, dont [l'UUID est 0x180F](https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf?v=1715804781019). Le service dispose d'une [charactéristique](https://github.com/oesmith/gatt-xml/blob/master/org.bluetooth.service.battery_service.xml), [`Battery level`](https://github.com/oesmith/gatt-xml/blob/master/org.bluetooth.characteristic.battery_level.xml), qui permet d'accéder à un champ `level` en uint8 qui va de 0 à 100 compris permettant de représenter le taux de charge du périphérique. L'UUID de cette charactéristique est `0x2A19`. Selon la description du service, la charactéristique peut être uniquement lue. Éventuellement, il est possible de s'inscrire pour des notifications pour recevoir la charge.
