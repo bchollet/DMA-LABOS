@@ -7,12 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import ch.heigvd.iict.dma.labo4.R
 import ch.heigvd.iict.dma.labo4.databinding.FragmentConnectedBinding
 import ch.heigvd.iict.dma.labo4.viewmodels.BleViewModel
 import java.text.SimpleDateFormat
-import java.util.Calendar
 
 class BleConnectedFragment : Fragment(), MenuProvider {
 
@@ -54,7 +52,7 @@ class BleConnectedFragment : Fragment(), MenuProvider {
         // time reading
         bleViewModel.currentTime.observe(viewLifecycleOwner) {
             if (it != null) {
-                binding.tempValue.text = SimpleDateFormat.getTimeInstance().format(it.time)
+                binding.currentTimeValue.text = SimpleDateFormat.getTimeInstance().format(it.time)
             }
         }
 
