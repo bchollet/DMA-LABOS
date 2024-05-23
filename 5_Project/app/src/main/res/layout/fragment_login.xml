@@ -1,14 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.ui.LoginFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/registerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/register"
+        app:layout_constraintBottom_toTopOf="@id/registerEditText"
+        app:layout_constraintStart_toStartOf="@id/registerEditText"
+        android:textSize="30sp"/>
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/registerEditText"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:autofillHints="username"
+        android:inputType="text"
+        android:labelFor="@id/registerEditText"
+        app:layout_constraintBottom_toTopOf="@id/loginTextView"
+        app:layout_constraintEnd_toStartOf="@id/registerButton"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/register"
+        app:layout_constraintBottom_toBottomOf="@id/registerEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/registerEditText" />
+
+    <TextView
+        android:id="@+id/loginTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/loginEditText"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="30sp"/>
+
+    <EditText
+        android:id="@+id/loginEditText"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:autofillHints="username"
+        android:inputType="text"
+        android:labelFor="@id/loginEditText"
+        app:layout_constraintEnd_toStartOf="@id/loginButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loginTextView" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:text="@string/login"
+        app:layout_constraintBottom_toBottomOf="@id/loginEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/registerButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
