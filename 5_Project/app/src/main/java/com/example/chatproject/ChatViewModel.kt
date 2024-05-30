@@ -3,12 +3,17 @@ package com.example.chatproject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.chatproject.model.Message
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.coroutineContext
 
 class ChatViewModel: ViewModel(), ChildEventListener {
 
@@ -27,12 +32,16 @@ class ChatViewModel: ViewModel(), ChildEventListener {
 
     fun sendMessage(content: String) {
         val children = messagesRef.push()
-        children.setValue(Message(children.key!!, _user.value!!, content))
+
+        children.setValue(Message(children.key!!, _user.value!!, content, content.startsWith("@admin ")))
     }
 
     fun login(author: String, isAdmin: Boolean) {
-        usersRef.child(author).setValue(isAdmin)
-        _user.postValue(author)
+        viewModelScope.launch {
+            val id = Firebase.auth.signInAnonymously().await().user!!.uid
+            usersRef.child(id).setValue(isAdmin)
+            _user.postValue(author)
+        }
     }
 
     override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {

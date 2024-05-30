@@ -34,6 +34,8 @@ class LoginFragment : Fragment() {
             Toast.makeText(requireContext(), "TU TE MOQUES DE QUI LA", Toast.LENGTH_SHORT).show()
             return
         }
+        Toast.makeText(requireContext(), "Connexion en cours ...", Toast.LENGTH_SHORT).show()
         chatViewModel.login(nameView.text.toString(), isAdminToggle.isChecked)
+        Toast.makeText(requireContext(), "Connexion terminée !", Toast.LENGTH_SHORT).show()
     }
 }
