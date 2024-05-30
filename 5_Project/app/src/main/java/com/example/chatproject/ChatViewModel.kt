@@ -1,5 +1,6 @@
 package com.example.chatproject
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,17 +13,17 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-class ChatViewModel(database: FirebaseDatabase = Firebase.database) : ViewModel(), ChildEventListener {
-    private val messagesRef = database.getReference("/messages")
+class ChatViewModel: ViewModel(), ChildEventListener {
+    private val messagesRef = Firebase.database.getReference("/messages")
     init {
         messagesRef.addChildEventListener(this)
     }
     private val _messages = MutableLiveData(emptyList<Message>())
     val messages: LiveData<List<Message>> get() = _messages
 
-    fun sendMessage(message: Message) {
+    fun sendMessage(author: String, content: String) {
         val children = messagesRef.push()
-        children.setValue(message)
+        children.setValue(Message(children.key!!, author, content))
     }
 
     override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
@@ -45,7 +46,4 @@ class ChatViewModel(database: FirebaseDatabase = Firebase.database) : ViewModel(
     override fun onCancelled(error: DatabaseError) {
         TODO("Not yet implemented")
     }
-
-
-
 }

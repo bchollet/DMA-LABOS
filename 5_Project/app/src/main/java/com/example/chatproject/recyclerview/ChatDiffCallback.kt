@@ -9,13 +9,13 @@ class ChatDiffCallback(private val oldList: List<Message>, private val newList: 
     override fun getNewListSize() = newList.size
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].id == newList[newItemPosition].id
+        return oldList[oldItemPosition] == newList[newItemPosition]
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val old = oldList[oldItemPosition]
         val new = newList[newItemPosition]
-        return old::class == new::class && old.content == new.content
+        return old::class == new::class && old.author == new.author && old.content == new.content
     }
 
 }
