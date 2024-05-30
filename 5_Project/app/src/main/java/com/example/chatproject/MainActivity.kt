@@ -1,36 +1,23 @@
 package com.example.chatproject
 
 import android.os.Bundle
-import android.widget.Button
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
 import com.example.chatproject.fragment.ui.ChatFragment
-import com.example.chatproject.fragment.ui.LoginFragment
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
+    private val chatViewModel: ChatViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setButtonListener()
-    }
-
-    private fun setButtonListener() {
-        val buttonLogin = findViewById<Button>(R.id.buttonLogin)
-        val buttonChat = findViewById<Button>(R.id.buttonChat)
-
-        buttonLogin.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.framelayout, LoginFragment.newInstance())
-                .addToBackStack(null)
-                .commit()
-        }
-
-        buttonChat.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.framelayout, ChatFragment.newInstance())
-                .addToBackStack(null)
-                .commit()
+        chatViewModel.user.observe(this) {
+            if (it.isNullOrBlank()) return@observe
+            supportFragmentManager.commit {
+                replace(R.id.framelayout, ChatFragment.newInstance())
+                addToBackStack(null)
+            }
         }
     }
 }
