@@ -11,6 +11,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class ChatViewModel: ViewModel(), ChildEventListener {
+
+    private val usersRef = Firebase.database.getReference("/users")
     private val messagesRef = Firebase.database.getReference("/messages")
 
     private val _user: MutableLiveData<String?> = MutableLiveData(null)
@@ -28,7 +30,8 @@ class ChatViewModel: ViewModel(), ChildEventListener {
         children.setValue(Message(children.key!!, _user.value!!, content))
     }
 
-    fun login(author: String) {
+    fun login(author: String, isAdmin: Boolean) {
+        usersRef.child(author).setValue(isAdmin)
         _user.postValue(author)
     }
 
@@ -52,4 +55,6 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     override fun onCancelled(error: DatabaseError) {
         TODO("Not yet implemented")
     }
+
+
 }

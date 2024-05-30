@@ -13,7 +13,7 @@
         android:text="@string/login"
         app:layout_constraintStart_toStartOf="@id/loginEditText"
         app:layout_constraintBottom_toTopOf="@id/loginEditText"
-        android:textSize="30sp"/>
+        android:textSize="@dimen/text"/>
 
     <EditText
         android:id="@+id/loginEditText"
@@ -34,5 +34,15 @@
         android:text="@string/login"
         app:layout_constraintBottom_toBottomOf="@id/loginEditText"
         app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <CheckBox
+        android:textSize="@dimen/text"
+        android:id="@+id/isAdmin"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:text="@string/isAdminToggleText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loginButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

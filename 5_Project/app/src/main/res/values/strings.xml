@@ -3,4 +3,5 @@
     <string name="send">Envoyer</string>
     <string name="login">Login</string>
     <string name="chat">Chat</string>
+    <string name="isAdminToggleText">Admin ?</string>
 </resources>
