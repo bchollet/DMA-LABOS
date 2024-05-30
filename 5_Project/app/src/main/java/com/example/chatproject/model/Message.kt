@@ -1,7 +1,7 @@
 package com.example.chatproject.model
 
 data class Message (
-    var id: Int, //TODO: Int ?
-    var author: String,
-    var content: String,
+    val id: Int,
+    val author: String,
+    val content: String,
 )
