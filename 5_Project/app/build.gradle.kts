@@ -53,11 +53,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.database.ktx)
-    // Import the BoM for the Firebase platform
-//    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
-
-    // Add the dependency for the Realtime Database library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("androidx.fragment:fragment-ktx:1.7.1")
+    implementation("androidx.activity:activity-ktx:1.9.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.1")
 
 }
 
