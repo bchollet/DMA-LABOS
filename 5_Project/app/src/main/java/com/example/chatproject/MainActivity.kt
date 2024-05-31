@@ -1,6 +1,7 @@
 package com.example.chatproject
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
@@ -19,5 +20,10 @@ class MainActivity : AppCompatActivity() {
                 addToBackStack(null)
             }
         }
+
+        chatViewModel.permissionError.observe(this) {
+            Toast.makeText(this, it,  Toast.LENGTH_LONG).show()
+        }
+
     }
 }

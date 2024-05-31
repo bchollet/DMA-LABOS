@@ -1,6 +1,7 @@
 package com.example.chatproject.fragment.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,10 @@ class ChatFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         chatViewModel.messages.observe(viewLifecycleOwner) {
             chatAdapter.items = it
+            Log.d("ChatCode", it.toString())
         }
+        chatViewModel.fetchLastMessages()
+
     }
 
     companion object {
