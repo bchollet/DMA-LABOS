@@ -24,8 +24,8 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     private val messagesRef = Firebase.database.getReference("/messages")
     private val adminMessagesRef = Firebase.database.getReference("/messages-admin")
 
-    private val _user: MutableLiveData<String?> = MutableLiveData(null)
-    val user get(): LiveData<String?> = _user
+    private val _user: MutableLiveData<String> = MutableLiveData("")
+    val user get(): LiveData<String> = _user
 
     private val _messages = MutableLiveData(emptyList<Message>())
     val messages: LiveData<List<Message>> get() = _messages
