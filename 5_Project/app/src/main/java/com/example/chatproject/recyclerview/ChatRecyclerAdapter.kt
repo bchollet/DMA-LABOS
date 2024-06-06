@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.chatproject.R
 import com.example.chatproject.model.Message
 
-class ChatRecyclerAdapter(_items: List<Message> = listOf()): RecyclerView.Adapter<ChatRecyclerAdapter.ViewHolder>() {
+class ChatRecyclerAdapter(_items: List<Message> = listOf(), val onClick: (Message) -> Unit, val onLongClick: (Message) -> Unit): RecyclerView.Adapter<ChatRecyclerAdapter.ViewHolder>() {
     var items = listOf<Message>()
         set(value) {
             val diffCallback = ChatDiffCallback(items, value)
@@ -28,6 +28,13 @@ class ChatRecyclerAdapter(_items: List<Message> = listOf()): RecyclerView.Adapte
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(items[position])
+        holder.itemView.setOnClickListener {
+            onClick(items[position])
+        }
+        holder.itemView.setOnLongClickListener {
+            onLongClick(items[position])
+            true
+        }
     }
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {

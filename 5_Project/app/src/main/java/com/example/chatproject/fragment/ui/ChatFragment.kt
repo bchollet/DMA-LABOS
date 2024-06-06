@@ -13,11 +13,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatproject.ChatViewModel
 import com.example.chatproject.R
+import com.example.chatproject.model.Message
 import com.example.chatproject.recyclerview.ChatRecyclerAdapter
 
 class ChatFragment : Fragment() {
     private val chatViewModel: ChatViewModel by activityViewModels()
-    private val chatAdapter = ChatRecyclerAdapter()
+    private val chatAdapter = ChatRecyclerAdapter(listOf(), this::deleteMessage, this::editMessage)
     private lateinit var messageContent: EditText
     private lateinit var messages: RecyclerView;
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -42,7 +43,14 @@ class ChatFragment : Fragment() {
             Log.d("ChatCode", it.toString())
         }
         chatViewModel.fetchLastMessages()
+    }
 
+    fun deleteMessage(msg: Message) {
+        chatViewModel.deleteMessage(msg.id)
+    }
+
+    fun editMessage(msg: Message) {
+        chatViewModel.editMessage(msg.id, msg.content)
     }
 
     companion object {

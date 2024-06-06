@@ -73,11 +73,11 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     }
 
     fun deleteMessage(messageId: String) {
-
+        Log.d("DELETE", "deleting message with id = ${messageId}")
     }
 
     fun editMessage(messageId: String, newContent: String) {
-
+        Log.d("EDIT", "editing message with id = ${messageId} with content = ${newContent}")
     }
 
     fun login(author: String, isAdmin: Boolean) {
