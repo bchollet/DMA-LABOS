@@ -6,4 +6,5 @@
     <string name="chat">Chat</string>
     <string name="isAdminToggleText">Admin ?</string>
     <string name="logged_as">Connecté en tant que %1$s</string>
+    <string name="channel_description">Réception de message</string>
 </resources>

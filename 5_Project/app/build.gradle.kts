@@ -58,6 +58,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.1")
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging-directboot")
 
 
 }

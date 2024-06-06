@@ -28,6 +28,7 @@ class ChatRecyclerAdapter(_items: List<Message> = listOf(), val onClick: (Messag
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(items[position])
+
     }
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
