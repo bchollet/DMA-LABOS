@@ -33,6 +33,8 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     private val _permissionError = MutableLiveData("")
     val permissionError: LiveData<String> get() = _permissionError
 
+    private var isAdmin: Boolean = false;
+
     fun fetchLastMessages() {
         val ti = object : GenericTypeIndicator<Map<String, Message>>() {}
         suspend fun getMessages(ref: DatabaseReference) : List<Message> {
@@ -73,11 +75,18 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     }
 
     fun deleteMessage(messageId: String) {
-
+        viewModelScope.launch {
+            usersRef.child(messageId).removeValue()
+            adminMessagesRef.child(messageId).removeValue()
+        }
     }
 
     fun editMessage(messageId: String, newContent: String) {
-
+        viewModelScope.launch {
+            val newMsg = Message(messageId, _user.value!!, newContent)
+            usersRef.child(messageId).setValue(newMsg)
+            adminMessagesRef.child(messageId).setValue(newMsg)
+        }
     }
 
     fun login(author: String, isAdmin: Boolean) {
@@ -88,7 +97,8 @@ class ChatViewModel: ViewModel(), ChildEventListener {
         }
 
         messagesRef.addChildEventListener(this)
-        if (isAdmin) {
+        this.isAdmin = isAdmin
+        if (this.isAdmin) {
             adminMessagesRef.addChildEventListener(this)
         }
 
@@ -100,11 +110,26 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     }
 
     override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-        TODO("Not yet implemented")
+        val changedMessage = snapshot.getValue(Message::class.java)!!
+        val newMessagesList = _messages.value!!.map {
+            if (it.id == changedMessage.id) {
+                changedMessage
+            } else {
+                it
+            }
+        }
+        _messages.postValue(newMessagesList)
     }
 
     override fun onChildRemoved(snapshot: DataSnapshot) {
-        TODO("Not yet implemented")
+        val removedMessage = snapshot.getValue(Message::class.java)!!
+        val newList = mutableListOf<Message>()
+        _messages.value!!.forEach {
+            if (it.id != removedMessage.id) {
+                newList.add(it)
+            }
+        }
+        _messages.postValue(newList)
     }
 
     override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
