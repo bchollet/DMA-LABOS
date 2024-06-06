@@ -72,6 +72,14 @@ class ChatViewModel: ViewModel(), ChildEventListener {
         }
     }
 
+    fun deleteMessage(messageId: String) {
+
+    }
+
+    fun editMessage(messageId: String, newContent: String) {
+
+    }
+
     fun login(author: String, isAdmin: Boolean) {
         viewModelScope.launch {
             val id = Firebase.auth.signInAnonymously().await().user!!.uid
