@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">ChatProject</string>
     <string name="send">Envoyer</string>
+    <string name="edit">Modifier</string>
     <string name="login">Login</string>
     <string name="chat">Chat</string>
     <string name="isAdminToggleText">Admin ?</string>

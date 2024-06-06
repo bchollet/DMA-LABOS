@@ -19,18 +19,27 @@ import com.example.chatproject.recyclerview.ChatRecyclerAdapter
 class ChatFragment : Fragment() {
     private val chatViewModel: ChatViewModel by activityViewModels()
     private val chatAdapter = ChatRecyclerAdapter(listOf(), this::deleteMessage, this::editMessage)
+    private var msgId: String? = null
     private lateinit var messageContent: EditText
-    private lateinit var messages: RecyclerView;
+    private lateinit var messages: RecyclerView
+    private lateinit var button: Button
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Linkage de la Recycler View et de son Adapter
        return inflater.inflate(R.layout.fragment_chat, container, false).apply {
+           button = findViewById(R.id.sendButton)
            messages = findViewById<RecyclerView?>(R.id.messages).apply {
                adapter = chatAdapter
                layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
            }
            messageContent = findViewById(R.id.messageEditText)
            findViewById<Button>(R.id.sendButton).setOnClickListener {
-               chatViewModel.sendMessage(messageContent.text.toString())
+               if (msgId != null) {
+                   chatViewModel.editMessage(msgId!!, messageContent.text.toString())
+                   button.setText(R.string.send)
+                   msgId = null
+               } else {
+                   chatViewModel.sendMessage(messageContent.text.toString())
+               }
                messageContent.text.clear()
            }
        }
@@ -50,7 +59,9 @@ class ChatFragment : Fragment() {
     }
 
     fun editMessage(msg: Message) {
-        chatViewModel.editMessage(msg.id, msg.content)
+        msgId = msg.id
+        button.setText(R.string.edit)
+        messageContent.setText(msg.content)
     }
 
     companion object {
