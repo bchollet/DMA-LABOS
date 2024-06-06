@@ -49,16 +49,16 @@ class ChatFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         chatViewModel.messages.observe(viewLifecycleOwner) {
             chatAdapter.items = it
-            Log.d("ChatCode", it.toString())
+            Log.d("ChatCode", "Received messages - $it")
         }
         chatViewModel.fetchLastMessages()
     }
 
-    fun deleteMessage(msg: Message) {
+    private fun deleteMessage(msg: Message) {
         chatViewModel.deleteMessage(msg.id)
     }
 
-    fun editMessage(msg: Message) {
+    private fun editMessage(msg: Message) {
         msgId = msg.id
         button.setText(R.string.edit)
         messageContent.setText(msg.content)

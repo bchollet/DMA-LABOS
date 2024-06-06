@@ -1,7 +1,6 @@
 package com.example.chatproject
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,76 +29,102 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     private val _messages = MutableLiveData(emptyList<Message>())
     val messages: LiveData<List<Message>> get() = _messages
 
-    private val _permissionError = MutableLiveData("")
-    val permissionError: LiveData<String> get() = _permissionError
+    private val _error = MutableLiveData("")
+    val error: LiveData<String> get() = _error
 
-    private var isAdmin: Boolean = false;
+    private fun messageDestination(messageContent: String) =
+        if (messageContent.startsWith("@admin "))
+            adminMessagesRef
+        else
+            messagesRef
 
     fun fetchLastMessages() {
-        val ti = object : GenericTypeIndicator<Map<String, Message>>() {}
-        suspend fun getMessages(ref: DatabaseReference) : List<Message> {
-            return ref
-                .limitToLast(10)
+        val incomingMessagePayloadType = object : GenericTypeIndicator<Map<String, Message>>() {}
+        suspend fun getMessages(ref: DatabaseReference) : List<Message>
+            = ref.limitToLast(10)
                 .orderByKey()
                 .get()
                 .await()
-                .getValue(ti)?.values?.toList()
+                .getValue(incomingMessagePayloadType)?.values?.toList()
                 ?: emptyList()
-        }
 
         viewModelScope.launch {
-            var adminMessages: List<Message> = emptyList()
-            try {
-                adminMessages = getMessages(adminMessagesRef)
-            } catch(e: Exception) {
-                _permissionError.postValue(e.message)
-            }
+            val adminMessages: List<Message> =
+                try {
+                    getMessages(adminMessagesRef)
+                }  catch(e: Exception) {
+                    _error.postValue(e.message)
+                    listOf()
+                }
             val messages = getMessages(messagesRef).plus(adminMessages)
             _messages.postValue(messages.sortedBy { it.id })
         }
     }
 
     fun sendMessage(content: String) {
-        val destination =
-            if (content.startsWith("@admin "))
-                adminMessagesRef.push()
-            else
-                messagesRef.push()
+        val destination = messageDestination(content).push()
         viewModelScope.launch {
             try {
-                destination.setValue(Message(destination.key!!, _user.value!!, content)).await()
+                destination.setValue(Message(destination.key!!, _user.value!!, content))
+                    .await()
             } catch (e: Exception) {
-                _permissionError.postValue(e.message)
+                _error.postValue(e.message)
             }
         }
     }
 
     fun deleteMessage(messageId: String) {
+        val messageToDelete = _messages.value!!
+            .find { it.id == messageId }
+            ?: throw IllegalArgumentException("$messageId does not exist")
         viewModelScope.launch {
-            usersRef.child(messageId).removeValue()
-            adminMessagesRef.child(messageId).removeValue()
+            try {
+                messageDestination(messageToDelete.content)
+                    .child(messageId)
+                    .removeValue()
+                    .await()
+            } catch(e: Exception) {
+                _error.postValue(e.message)
+            }
+
         }
     }
 
     fun editMessage(messageId: String, newContent: String) {
         viewModelScope.launch {
             val newMsg = Message(messageId, _user.value!!, newContent)
-            usersRef.child(messageId).setValue(newMsg)
-            adminMessagesRef.child(messageId).setValue(newMsg)
+            messageDestination(newContent)
+                .child(messageId)
+                .setValue(newMsg)
+                .await()
         }
     }
 
     fun login(author: String, isAdmin: Boolean) {
+        // clear messages if there are some
+        _messages.postValue(listOf())
         viewModelScope.launch {
-            val id = Firebase.auth.signInAnonymously().await().user!!.uid
-            usersRef.child(id).setValue(isAdmin)
-            _user.postValue(author)
-        }
+            // anonymously sign in the user
+            // this is the simplest form of auth that we found and is used only for the demo
+            val id = Firebase.auth
+                .signInAnonymously()
+                .await()
+                .user!!
+                .uid
 
-        messagesRef.addChildEventListener(this)
-        this.isAdmin = isAdmin
-        if (this.isAdmin) {
-            adminMessagesRef.addChildEventListener(this)
+            usersRef.child(id)
+                .setValue(isAdmin)
+                .await() // we ensure that the user is correctly registered before the rest
+
+            _user.postValue(author)
+
+            messagesRef.addChildEventListener(this@ChatViewModel)
+            if (isAdmin) {
+                adminMessagesRef.addChildEventListener(this@ChatViewModel)
+            } else {
+                // prevent being still subscribed to admin messages when swapping the status
+                adminMessagesRef.removeEventListener(this@ChatViewModel)
+            }
         }
 
     }
@@ -109,7 +134,9 @@ class ChatViewModel: ViewModel(), ChildEventListener {
         _messages.postValue(_messages.value?.plus(message))
     }
 
+
     override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+        // find which message has been changed and swap it
         val changedMessage = snapshot.getValue(Message::class.java)!!
         val newMessagesList = _messages.value!!.map {
             if (it.id == changedMessage.id) {
@@ -122,6 +149,7 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     }
 
     override fun onChildRemoved(snapshot: DataSnapshot) {
+        // find which message has been removed  adn remove it in the new list
         val removedMessage = snapshot.getValue(Message::class.java)!!
         val newList = mutableListOf<Message>()
         _messages.value!!.forEach {
@@ -137,12 +165,7 @@ class ChatViewModel: ViewModel(), ChildEventListener {
     }
 
     override fun onCancelled(error: DatabaseError) {
-        if (error.code == DatabaseError.PERMISSION_DENIED) {
-            _permissionError.postValue(error.message)
-            return
-        }
-        TODO("Not yet implemented")
+        _error.postValue(error.message)
+        Log.e("ChatCode", "Error occured with Firebase", error.toException())
     }
-
-
 }

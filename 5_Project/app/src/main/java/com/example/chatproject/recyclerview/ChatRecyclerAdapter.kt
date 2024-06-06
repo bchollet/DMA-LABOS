@@ -28,13 +28,6 @@ class ChatRecyclerAdapter(_items: List<Message> = listOf(), val onClick: (Messag
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(items[position])
-        holder.itemView.setOnClickListener {
-            onClick(items[position])
-        }
-        holder.itemView.setOnLongClickListener {
-            onLongClick(items[position])
-            true
-        }
     }
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
@@ -43,6 +36,13 @@ class ChatRecyclerAdapter(_items: List<Message> = listOf(), val onClick: (Messag
         fun bind(message: Message) {
             messageAuthor.text = message.author
             messageContent.text = message.content
+            itemView.setOnClickListener {
+                onClick(items[layoutPosition])
+            }
+            itemView.setOnLongClickListener {
+                onLongClick(items[layoutPosition])
+                true
+            }
         }
     }
 }
