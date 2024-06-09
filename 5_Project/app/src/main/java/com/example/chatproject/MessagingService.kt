@@ -6,10 +6,6 @@ import com.google.firebase.messaging.RemoteMessage
 
 
 class MessagingService : FirebaseMessagingService() {
-    companion object {
-        val CHANNEL_ID: String = "ChatProject"
-
-    }
     private val TAG = "ChatMessagingService"
 
     override fun onNewToken(token: String) {
