@@ -1,5 +1,6 @@
 package com.example.chatproject.recyclerview
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.chatproject.R
 import com.example.chatproject.model.Message
 
+// handle the list of messages in the chatbox
 class ChatRecyclerAdapter(_items: List<Message> = listOf(), val onClick: (Message) -> Unit, val onLongClick: (Message) -> Unit): RecyclerView.Adapter<ChatRecyclerAdapter.ViewHolder>() {
     var items = listOf<Message>()
         set(value) {
@@ -38,6 +40,9 @@ class ChatRecyclerAdapter(_items: List<Message> = listOf(), val onClick: (Messag
             messageAuthor.text = message.author
             messageContent.text = message.content
             itemView.setOnClickListener {
+                if (layoutPosition < 0) {
+                    return@setOnClickListener
+                }
                 onClick(items[layoutPosition])
             }
             itemView.setOnLongClickListener {

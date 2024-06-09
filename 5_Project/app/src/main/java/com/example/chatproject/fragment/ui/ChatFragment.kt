@@ -24,16 +24,20 @@ class ChatFragment : Fragment() {
     private lateinit var messages: RecyclerView
     private lateinit var button: Button
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Linkage de la Recycler View et de son Adapter
        return inflater.inflate(R.layout.fragment_chat, container, false).apply {
            button = findViewById(R.id.sendButton)
+
+
            messages = findViewById<RecyclerView?>(R.id.messages).apply {
                adapter = chatAdapter
                layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
            }
            messageContent = findViewById(R.id.messageEditText)
+
+           // setup the "send" button
            findViewById<Button>(R.id.sendButton).setOnClickListener {
-               if (msgId != null) {
+
+               if (msgId != null) {  // if in "edit" mode
                    chatViewModel.editMessage(msgId!!, messageContent.text.toString())
                    button.setText(R.string.send)
                    msgId = null

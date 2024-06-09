@@ -17,6 +17,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.example.chatproject.fragment.ui.ChatFragment
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
@@ -30,29 +31,33 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Firebase.database.setPersistenceEnabled(false)
-
         val fragmentContainerView = findViewById<View>(R.id.framelayout);
+
+        // swap to the login fragment when logged in
         chatViewModel.user.observe(this) {
             if (it.isNullOrBlank()) return@observe
-            Log.d("ChatProject", it)
             supportFragmentManager.commit {
                 replace(R.id.framelayout, ChatFragment.newInstance())
                 addToBackStack(null)
             }
-            // Display a message
-            Snackbar
-                .make(fragmentContainerView, getString(R.string.logged_as, it), Snackbar.LENGTH_SHORT)
+
+            Snackbar.make(fragmentContainerView, getString(R.string.logged_as, it), Snackbar.LENGTH_SHORT)
+                .setAction("Close") {} // Dismiss by default
                 .show()
         }
+
+        // display every error as a snackbar message
         chatViewModel.error.observe(this) {
-            Snackbar
-                .make(fragmentContainerView, it, Snackbar.LENGTH_SHORT)
+            Snackbar.make(fragmentContainerView, it, Snackbar.LENGTH_SHORT)
+                .setAction("Close") {} // Dismiss by default
                 .show()
         }
         askNotificationPermission()
 
-        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications").addOnCompleteListener {
+        // try to subscribe to the notifications top using Firebase CM
+        FirebaseMessaging.getInstance()
+            .subscribeToTopic("pushNotifications")
+            .addOnCompleteListener {
             if (!it.isSuccessful) {
                 Log.d("ChatCode", "Unsuccessful subscribtion to topic")
             } else {
@@ -63,18 +68,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startService() {
-        Log.d("ChatProject", "Starting service ...")
+        Log.d("ChatCode", "Starting service ...")
         val intentService = Intent(this, MessagingService::class.java)
         startService(intentService)
-        val channel = NotificationChannel(MessagingService.CHANNEL_ID, MessagingService.CHANNEL_ID, NotificationManager.IMPORTANCE_DEFAULT)
-        channel.description = getString(R.string.channel_description)
-        val notificationManager = getSystemService(
-            NotificationManager::class.java
-        )
-        notificationManager.createNotificationChannel(channel)
     }
 
-    // Declare the launcher at the top of your Activity/Fragment:
+    //  Request the notification permission for the incoming messages
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission(),) { isGranted: Boolean ->
         if (isGranted) {
             startService()
